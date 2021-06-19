@@ -1,5 +1,6 @@
 <?php include_once 'includes/header.php' ?>
 <?php delete_category()?>
+<?php delete_post() ?>
 
 
     <div id="wrapper">
@@ -16,7 +17,7 @@
                     <div class="col-lg-12">
                         <h1 class="page-header">
                             Posts
-                            <small>Manage posts</small>
+                            <small>Manage Posts</small>
                         </h1>
                     </div>
                 </div>
@@ -33,6 +34,10 @@
     switch($source) {
         case 'add_post';
         include_once "includes/add_post.php";
+        break;
+
+        case 'edit_post';
+        include_once 'includes/edit_post.php';
         break;
 
         default:

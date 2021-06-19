@@ -23,7 +23,7 @@ body {
 
 #page-wrapper {
     width: 100%;
-    /*overflow-x: auto !important;*/
+    overflow-x: auto !important;
     padding: 0;
     background-color: #fff;
 }
@@ -41,6 +41,14 @@ body {
     #page-wrapper {
         padding: 10px;
     }
+}
+
+.d-block {
+    display: block !important;
+}
+
+.mb-2 {
+    margin-bottom: 10px !important;
 }
 
 /* Top Navigation */

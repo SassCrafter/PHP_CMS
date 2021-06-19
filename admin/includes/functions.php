@@ -1,5 +1,28 @@
 <?php
 
+	function show_query_error($result) {
+		global $connection;
+		if (!$result) {
+			die("Query Failed! " . mysqli_error($connection));
+		}
+	}
+
+	function escape_string($str) {
+		global $connection;
+		return mysqli_real_escape_string($connection, $str);
+	}
+
+
+	function shorten_string($str, $len) {
+		$result = $str;
+        if (iconv_strlen($str) > $len) {
+            $result = substr($str, 0, $len - 3) . '...';
+        }
+        return $result;
+	}
+
+	// Categories
+
 	function select_all_categories() {
 		global $connection;
 		$cat_query = 'SELECT * FROM categories';
@@ -25,6 +48,7 @@
         }
 	}
 
+
 	function delete_category() {
 		global $connection;
 		if (isset($_GET['delete'])) {
@@ -32,19 +56,26 @@
 	        $delete_query = "DELETE FROM categories WHERE cat_id = $delete_id";
 	        $delete_result = mysqli_query($connection, $delete_query);
 
-	        if(!$delete_result) {
-	            $error = mysqli_error($connection);
-	            die($error);
-	        }
+	        show_query_error($delete_result);
+
 	        header("Location: categories.php");
 	    }
 	}
 
 
-	function shorten_string($str, $len) {
-		$result = $str;
-        if (iconv_strlen($str) > $len) {
-            $result = substr($str, 0, $len - 3) . '...';
-        }
-        return $result;
+
+	// Posts
+	function delete_post() {
+		global $connection;
+		if (isset($_GET['delete_id'])) {
+			$delete_id = $_GET['delete_id'];
+			$delete_query = "DELETE FROM posts WHERE post_id = $delete_id";
+
+			$delete_result = mysqli_query($connection, $delete_query);
+
+			show_query_error($delete_result);
+
+			header("Location: view_all_posts.php");
+		}
 	}
+
