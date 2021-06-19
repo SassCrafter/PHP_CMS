@@ -1,4 +1,6 @@
+<?php ob_start(); ?>
 <?php include_once "../includes/db.php";?>
+<?php include_once "includes/functions.php" ?>
 <!DOCTYPE html>
 <html lang="en">
 
