@@ -36,8 +36,16 @@
 
 	<!-- Category ID -->
 	<div class="form-group">
-		<label for="post_category_id">Post ID</label>
-		<input class='form-control' type="text" id='post_category_id' name='post_category_id' required >
+		<label for="post_category_id">Post Category</label>
+		
+		<select class='form-control' name="post_category_id" id="post_category_id">
+			<?php
+				$categories_result = select_all_categories();
+				while ($cat_row = mysqli_fetch_assoc($categories_result)) {
+					echo "<option value='$cat_row[cat_id]' >$cat_row[cat_title]</option>";
+				}
+			?>
+		</select>
 	</div>
 
 

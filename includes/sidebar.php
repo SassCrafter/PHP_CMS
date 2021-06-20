@@ -30,29 +30,29 @@
                     ?>
                     <h4>Blog Categories</h4>
                     <div class="row">
-                        <div class="col-lg-6">
-                            <ul class="list-unstyled">
-                                <?php
-                                    while($row = mysqli_fetch_assoc($categories)) {
-                                        echo "<li><a href='#'>$row[cat_title]</a></li>";
-                                    }
-                                ?>
-                            </ul>
-                        </div>
-                        <!-- /.col-lg-6 -->
-                        <div class="col-lg-6">
-                            <ul class="list-unstyled">
-                                <li><a href="#">Category Name</a>
-                                </li>
-                                <li><a href="#">Category Name</a>
-                                </li>
-                                <li><a href="#">Category Name</a>
-                                </li>
-                                <li><a href="#">Category Name</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <!-- /.col-lg-6 -->
+                        <?php
+                            $counter = 0;
+                            $cat_counter = 0;
+                            $row_quantity = mysqli_num_rows($categories);
+                            while($row = mysqli_fetch_assoc($categories)) {
+                                if ($counter % 4 == 0) {
+                                    $cat_counter = 0;
+                                    echo "  
+                                        <div class='col-md-5'>
+                                            <ul class='list-unstyled'>
+                                    ";
+                                }
+                                echo "<li><a href='./view_by_category.php?cat_id=$row[cat_id]'>$row[cat_title] </a></li>";
+                               if ($cat_counter == 3 || $counter == $row_quantity - 1) {
+                                echo "  
+                                        </ul>
+                                    </div>
+                                ";
+                               }
+                                $counter++;
+                                $cat_counter++;
+                            }
+                        ?>
                     </div>
                     <!-- /.row -->
                 </div>
@@ -61,3 +61,7 @@
                 <?php include "widget.php"?>
 
             </div>
+
+
+
+

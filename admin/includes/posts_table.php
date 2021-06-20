@@ -4,6 +4,7 @@
             <th>Id</th>
             <th>Title</th>
             <th>Content</th>
+            <th>Category</th>
             <th>Author</th>
             <th>Image</th>
             <th>Date</th>
@@ -25,12 +26,26 @@
                     $post_id = $row['post_id'];
                     $post_title = shorten_string($row['post_title'], 30);
                     $post_content = shorten_string($row['post_content'], 30);
+                    $post_category_id = $row['post_category_id'];
                     
                 ?>
                 <tr>
                     <td><?php echo $post_id ?></td>
                     <td><?php echo $post_title ?></td>
                     <td><?php echo $post_content ?></td>
+
+                    <?php // Get category by id
+                    $category_result = select_category_by_id($post_category_id);
+
+                    while ($cat_row = mysqli_fetch_assoc($category_result)) {
+                        $post_category = $cat_row['cat_title'];
+                    }
+
+                    ?>
+
+                    <td><?php echo $post_category ?></td>
+
+
                     <td><?php echo $row['post_author'] ?></td>
                     <td>
                         <img width='100' style='max-height: 100px;' src="../images/<?php echo $row['post_image']?>" alt="image">

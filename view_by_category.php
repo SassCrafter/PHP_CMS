@@ -22,9 +22,15 @@
                 <!-- Posts -->
 
                 <?php
-                    $posts = select_all_posts();
+                    if (isset($_GET['cat_id'])) {
+                        $cat_id = $_GET['cat_id'];
+                    }
+                    $posts = select_post_by_category_id($cat_id);
 
-                    while($row = mysqli_fetch_assoc($posts)):?>
+                    if (mysqli_num_rows($posts) == 0) {
+                        echo "<h2>No posts found!</h2>";
+                    } else {
+                        while($row = mysqli_fetch_assoc($posts)):?>
                         <?php
                             $post_id = $row['post_id'];
                             $post_title = $row['post_title'];
@@ -49,7 +55,9 @@
                             <a class="btn btn-primary" href="./post.php?post_id=<?php echo $post_id ?>">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
                         </article>
 
-                    <?php endwhile ?>
+                    <?php endwhile; } ?>
+
+                    
             </div>
 
             <!-- Blog Sidebar Widgets Column -->

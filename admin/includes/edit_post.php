@@ -1,6 +1,11 @@
 <?php
+	
+
 	if (isset($_GET['post_id'])) {
 		$post_id = $_GET['post_id'];
+
+		edit_post($post_id);
+
 
 		$get_post_query = "SELECT * FROM posts WHERE post_id = $post_id";
 		$get_post_result = mysqli_query($connection, $get_post_query);
@@ -17,29 +22,7 @@
 		$post_content = $row['post_content'];
 		$post_date = $row['post_date'];
 	}
-	// if (isset($_POST['publish_post'])) {
-	// 	$post_title = escape_string($_POST['post_title']);
-	// 	$post_category_id = escape_string($_POST['post_category_id']);
-	// 	$post_author = escape_string($_POST['post_author']);
-	// 	$post_status = escape_string($_POST['post_status']);
-
-	// 	$post_image = $_FILES['post_image']['name'];
-	// 	$post_image_temp = $_FILES['post_image']['tmp_name'];
-
-	// 	$post_tags = escape_string($_POST['post_tags']);
-	// 	$post_content = escape_string($_POST['post_content']);
-	// 	$post_date = date('d-m-y');
-	// 	$post_comment_count = 4;
-
-	// 	// Move uploaded image
-	// 	move_uploaded_file($post_image_temp, "../images/$post_image");
-
-	// 	$create_post_query = "INSERT INTO posts (post_category_id, post_title, post_author, post_date, post_image, post_content, post_tags, post_comment_count, post_status) VALUES ($post_category_id, '$post_title', '$post_author', now(), '$post_image', '$post_content', '$post_tags', '$post_comment_count', '$post_status')";
-
-	// 	$create_post_result = mysqli_query($connection, $create_post_query);
-
-	// 	show_query_error($create_post_result);
-	// }
+	
 	
 ?>
 
@@ -51,10 +34,22 @@
 		<input class='form-control' value='<?php echo $post_title ?>' type="text" id='post_title' name='post_title' required >
 	</div>
 
-	<!-- Category ID -->
+	<!-- Category -->
+
 	<div class="form-group">
-		<label for="post_category_id">Post ID</label>
-		<input class='form-control' value="<?php echo $post_category_id ?>" type="text" id='post_category_id' name='post_category_id' required >
+		<label for="post_category_id">Post Category</label>
+		<select name="post_category_id" id="post_category_id" class="form-control">
+			<?php
+				$fetched_categories = select_all_categories();
+				while ($cat_row = mysqli_fetch_assoc($fetched_categories)) {
+					$isSelected = '';
+					if ($cat_row['cat_id'] == $post_category_id) {
+						$isSelected = 'selected';
+					}
+					echo "<option value='$cat_row[cat_id]' $isSelected>$cat_row[cat_title]</option>";
+				}
+			?>
+		</select>
 	</div>
 
 
@@ -73,6 +68,7 @@
 	<!-- Image -->
 	<div class="form-group">
 		<label for="post_image">Post Image</label>
+		<img width='100' style='display: block; max-height: 100px; margin-bottom: 10px;' src="../images/<?php echo $post_image ?>" alt="<?php echo $post_title?>">
 		<input  type="file" id='post_image' name='post_image' >
 	</div>
 
