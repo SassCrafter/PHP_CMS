@@ -12,7 +12,7 @@
         <div class="row">
 
             <!-- Blog Post Content Column -->
-            <div class="col-lg-8" style='margin-bottom: 20px'>
+            <div class="col-md-8" style='margin-bottom: 20px'>
 
                 <?php
                     if (isset($_GET['post_id'])) {
