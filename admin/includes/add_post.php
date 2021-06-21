@@ -1,28 +1,6 @@
 <?php
 	
-	if (isset($_POST['publish_post'])) {
-		$post_title = escape_string($_POST['post_title']);
-		$post_category_id = escape_string($_POST['post_category_id']);
-		$post_author = escape_string($_POST['post_author']);
-		$post_status = escape_string($_POST['post_status']);
-
-		$post_image = $_FILES['post_image']['name'];
-		$post_image_temp = $_FILES['post_image']['tmp_name'];
-
-		$post_tags = escape_string($_POST['post_tags']);
-		$post_content = escape_string($_POST['post_content']);
-		$post_date = date('d-m-y');
-		$post_comment_count = 4;
-
-		// Move uploaded image
-		move_uploaded_file($post_image_temp, "../images/$post_image");
-
-		$create_post_query = "INSERT INTO posts (post_category_id, post_title, post_author, post_date, post_image, post_content, post_tags, post_comment_count, post_status) VALUES ($post_category_id, '$post_title', '$post_author', now(), '$post_image', '$post_content', '$post_tags', '$post_comment_count', '$post_status')";
-
-		$create_post_result = mysqli_query($connection, $create_post_query);
-
-		show_query_error($create_post_result);
-	}
+	create_post();
 	
 ?>
 
@@ -56,10 +34,7 @@
 	</div>
 
 	<!-- Status -->
-	<div class="form-group">
-		<label for="post_status">Post Status</label>
-		<input class='form-control' type="text" id='post_status' name='post_status' required >
-	</div>
+	<?php include_once './includes/edit_post_status.php' ?>
 
 	<!-- Image -->
 	<div class="form-group">

@@ -31,7 +31,9 @@
                 ?>
                 <tr>
                     <td><?php echo $post_id ?></td>
-                    <td><?php echo $post_title ?></td>
+                    <td>
+                        <a href="../post.php?post_id=<?php echo $post_id ?>"><?php echo $post_title ?></a>
+                    </td>
                     <td><?php echo $post_content ?></td>
 
                     <?php // Get category by id

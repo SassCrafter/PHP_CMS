@@ -22,7 +22,7 @@
                 <!-- Posts -->
 
                 <?php
-                    $posts = select_all_posts();
+                    $posts = select_all_posts_by_status();
 
                     while($row = mysqli_fetch_assoc($posts)):?>
                         <?php

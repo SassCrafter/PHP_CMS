@@ -107,6 +107,42 @@
 		return $select_post_result;
 	}
 
+	function select_all_posts_by_status($status = 'published') {
+		global $connection;
+		$query = "SELECT * FROM posts WHERE post_status = '$status' ORDER BY DATE(post_date) DESC";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+		return $result;
+	}
+
+	function create_post() {
+		global $connection;
+		if (isset($_POST['publish_post'])) {
+			$post_title = escape_string($_POST['post_title']);
+			$post_category_id = escape_string($_POST['post_category_id']);
+			$post_author = escape_string($_POST['post_author']);
+			$post_status = escape_string($_POST['post_status']);
+
+			$post_image = $_FILES['post_image']['name'];
+			$post_image_temp = $_FILES['post_image']['tmp_name'];
+
+			$post_tags = escape_string($_POST['post_tags']);
+			$post_content = escape_string($_POST['post_content']);
+			$post_date = date('d-m-y');
+			$post_comment_count = 0;
+
+			// Move uploaded image
+			move_uploaded_file($post_image_temp, "../images/$post_image");
+
+			$create_post_query = "INSERT INTO posts (post_category_id, post_title, post_author, post_date, post_image, post_content, post_tags, post_comment_count, post_status) VALUES ($post_category_id, '$post_title', '$post_author', now(), '$post_image', '$post_content', '$post_tags', '$post_comment_count', '$post_status')";
+
+			$create_post_result = mysqli_query($connection, $create_post_query);
+
+			show_query_error($create_post_result);
+		}
+	}
+
 
 	function delete_post() {
 		global $connection;
@@ -173,3 +209,98 @@
 
 
 
+	// Comments
+
+	function select_all_comments() {
+		global $connection;
+		$comments_query = "SELECT * FROM comments";
+		$comments_result = mysqli_query($connection, $comments_query);
+
+		show_query_error($comments_result);
+		return $comments_result;
+	}
+
+	function select_all_comments_desc() {
+		global $connection;
+		$comments_query = "SELECT * FROM comments ORDER BY comment_id DESC";
+		$comments_result = mysqli_query($connection, $comments_query);
+
+		show_query_error($comments_result);
+		return $comments_result;
+	}
+
+	function increase_comment_count($post_id) {
+		global $connection;
+		$query = "UPDATE posts SET post_comment_count = post_comment_count + 1 WHERE post_id = $post_id";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+	}
+
+	function create_comment($post_id) {
+		global $connection;
+		if (isset($_POST['submit_comment'])) {
+			$comment_post_id = $post_id;
+			$author = $_POST['comment_author'];
+			$email = $_POST['comment_email'];
+			$content = $_POST['comment_content'];
+
+			$query = "INSERT INTO comments (comment_post_id, comment_author, comment_email, comment_content, comment_status, comment_date) ";
+			$query .= "VALUES ($comment_post_id, '$author', '$email', '$content', 'unapproved', now())";
+
+			$result = mysqli_query($connection, $query);
+
+			show_query_error($result);
+
+			increase_comment_count($comment_post_id);
+		}
+	}
+
+	function delete_comment() {
+		global $connection;
+		if (isset($_GET['delete_id'])) {
+			$delete_id = $_GET['delete_id'];
+			$delete_query = "DELETE FROM comments WHERE comment_id = $delete_id";
+
+			$delete_result = mysqli_query($connection, $delete_query);
+
+			show_query_error($delete_result);
+
+			header("Location: view_all_comments.php");
+		}
+	}
+
+	function approve_comment() {
+		global $connection;
+		if (isset($_GET['approve'])) {
+			$comment_id = $_GET['approve'];
+			$query = "UPDATE comments SET comment_status = 'approved' WHERE comment_id = $comment_id";
+			$result = mysqli_query($connection, $query);
+
+			show_query_error($result);
+			header("Location: view_all_comments.php");
+		}
+	}
+
+	function unapprove_comment() {
+		global $connection;
+		if (isset($_GET['unapprove'])) {
+			$comment_id = $_GET['unapprove'];
+			$query = "UPDATE comments SET comment_status = 'unapproved' WHERE comment_id = $comment_id";
+			$result = mysqli_query($connection, $query);
+
+			show_query_error($result);
+			header("Location: view_all_comments.php");
+		}
+	}
+
+	function select_comments_by_post_and_approved($post_id) {
+		global $connection;
+		$query = "SELECT * FROM comments WHERE comment_post_id = $post_id ";
+		$query .= "AND comment_status = 'approved' ";
+		$query .= "ORDER BY comment_id DESC";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+		return $result;
+	}

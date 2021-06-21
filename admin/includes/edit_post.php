@@ -59,11 +59,8 @@
 		<input class='form-control' value="<?php echo $post_author ?>" type="text" id='post_author' name='post_author' required >
 	</div>
 
-	<!-- Status -->
-	<div class="form-group">
-		<label for="post_status">Post Status</label>
-		<input class='form-control' value="<?php echo $post_status ?>" type="text" id='post_status' name='post_status' required >
-	</div>
+
+	<?php include_once './includes/edit_post_status.php' ?>
 
 	<!-- Image -->
 	<div class="form-group">
