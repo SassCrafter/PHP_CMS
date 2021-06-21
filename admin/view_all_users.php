@@ -1,7 +1,6 @@
 <?php include_once 'includes/header.php' ?>
-<?php delete_comment() ?>
-<?php unapprove_comment() ?>
-<?php approve_comment() ?>
+<?php delete_user(); ?>
+
 
 
     <div id="wrapper">
@@ -17,8 +16,8 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                            Posts
-                            <small>Manage Posts</small>
+                            Users
+                            <small>Manage Users</small>
                         </h1>
                     </div>
                 </div>
@@ -27,7 +26,24 @@
                 <div class="row">
                     <div class="col-lg-12">
 <?php
-    include_once "includes/comments_table.php";
+    $source = '';
+    if (isset($_GET['source'])) {
+        $source = $_GET['source'];
+    }
+
+    switch($source) {
+        case 'add_user';
+        include_once "./includes/add_user.php";
+        break;
+
+        case 'edit_user';
+        include_once "./includes/edit_user.php";
+        break;
+
+        default:
+        include_once "includes/users_table.php";
+        break;
+    }
 ?>
                     </div>
                 </div>  

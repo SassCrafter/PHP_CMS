@@ -241,9 +241,9 @@
 		global $connection;
 		if (isset($_POST['submit_comment'])) {
 			$comment_post_id = $post_id;
-			$author = $_POST['comment_author'];
-			$email = $_POST['comment_email'];
-			$content = $_POST['comment_content'];
+			$author = escape_string($_POST['comment_author']);
+			$email = escape_string($_POST['comment_email']);
+			$content = escape_string($_POST['comment_content']);
 
 			$query = "INSERT INTO comments (comment_post_id, comment_author, comment_email, comment_content, comment_status, comment_date) ";
 			$query .= "VALUES ($comment_post_id, '$author', '$email', '$content', 'unapproved', now())";
@@ -303,4 +303,111 @@
 
 		show_query_error($result);
 		return $result;
+	}
+
+
+
+	// Users
+
+	function select_all_users() {
+		global $connection;
+		$query = "SELECT * FROM users";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+		return $result;
+	}
+
+	function create_user_in_admin() {
+		global $connection;
+		if (isset($_POST['create_user'])) {
+			$username = $_POST['username'];
+			$password = $_POST['password'];
+			$firstname = $_POST['firstname'];
+			$lastname = $_POST['lastname'];
+			$email = $_POST['email'];
+			// $user_image = $_POST['user_image'];
+			$user_role = $_POST['user_role'];
+
+			$query = "INSERT INTO users (username, password, firstname, lastname, email, user_role) VALUES ('$username', '$password', '$firstname', '$lastname', '$email', '$user_role')";
+			$result = mysqli_query($connection, $query);
+
+			show_query_error($result);
+			header("Location: view_all_users.php");
+		}
+	}
+
+	function delete_user() {
+		global $connection;
+		if (isset($_GET['delete_id'])) {
+			$delete_id = $_GET['delete_id'];
+			$delete_query = "DELETE FROM users WHERE user_id = $delete_id";
+
+			$delete_result = mysqli_query($connection, $delete_query);
+
+			show_query_error($delete_result);
+
+			header("Location: view_all_users.php");
+		}
+	}
+
+	function select_user_by_id($id) {
+		global $connection;
+		$query = "SELECT * FROM users WHERE user_id = $id";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+		return $result;
+	}
+
+
+	function display_role_select($show_selected = False, $active_role = '') {
+		global $connection;
+		$roles_query = "SELECT user_role FROM users";
+		$roles_result = mysqli_query($connection, $roles_query);
+		show_query_error($roles_result);
+
+		$roles = [];
+
+		$rows = mysqli_fetch_all($roles_result, MYSQLI_ASSOC);
+		// print_r($rows);
+
+		foreach($rows as $row) {
+			if (!in_array($row['user_role'], $roles)) {
+				$roles[] = $row['user_role'];
+			}
+		}
+		if($show_selected) {
+			echo "<option value='$active_role' selected>$active_role</option>";
+		}
+		foreach($roles as $role) {
+			echo "<option value='$role'>$role</option>";
+		}
+	}
+
+
+	function edit_user($id) {
+		global $connection;
+		if (isset($_POST['edit_user'])) {
+			$username = $_POST['username'];
+			$password = $_POST['password'];
+			$lastname = $_POST['lastname'];
+			$firstname = $_POST['firstname'];
+			$email = $_POST['email'];
+			$user_role = $_POST['user_role'];
+			
+			$query = "UPDATE users SET ";
+			$query .= "username = '$username', ";
+			$query .= "password = '$password', ";
+			$query .= "firstname = '$firstname', ";
+			$query .= "lastname = '$lastname', ";
+			$query .= "email = '$email', ";
+			$query .= "user_role = '$user_role' ";
+			$query .= "WHERE user_id = $id";
+
+			$result = mysqli_query($connection, $query);
+
+			show_query_error($result);
+			header("Location: view_all_users.php");
+		}
 	}
