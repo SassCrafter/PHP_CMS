@@ -1,7 +1,5 @@
 <?php include_once 'includes/header.php' ?>
-<?php delete_comment() ?>
-<?php unapprove_comment() ?>
-<?php approve_comment() ?>
+
 
 
     <div id="wrapper">
@@ -17,8 +15,8 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                            Comments
-                            <small>Manage Comments</small>
+                            Profile
+                            <small>Manage Profile</small>
                         </h1>
                     </div>
                 </div>
@@ -27,7 +25,20 @@
                 <div class="row">
                     <div class="col-lg-12">
 <?php
-    include_once "includes/comments_table.php";
+    $source = '';
+    if (isset($_GET['source'])) {
+        $source = $_GET['source'];
+    }
+
+    switch($source) {
+        case 'edit_profile';
+        include_once "./includes/edit_profile.php";
+        break;
+
+        default:
+        include_once "includes/profile_table.php";
+        break;
+    }
 ?>
                     </div>
                 </div>  

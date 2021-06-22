@@ -12,6 +12,7 @@
 		$username = $user['username'];
 
 		edit_user($user_id);
+		header("Location: view_all_users.php");
 	}
 ?>
 

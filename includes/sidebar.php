@@ -6,6 +6,25 @@
 
 <div class="col-md-4">
 
+                <?php
+                    if (!$_SESSION['user']):
+                ?>
+                <!-- Login -->
+                <div class="well">
+                    <h4>Login</h4>
+                    <form action="./includes/login.php" method='POST'>
+                        <div class="form-group">
+                            <input type="text" placeholder="Username" name='login_username' class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" placeholder="Password" name='login_password' class="form-control" required>
+                        </div>
+                        <input type="submit" value='Login' class='btn btn-primary' name='login'>
+                    <!-- /.input-group -->
+                    </form>
+                </div>
+                <?php endif; ?>
+
                 <!-- Blog Search Well -->
                 <div class="well">
                     <h4>Blog Search</h4>

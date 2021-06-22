@@ -1,6 +1,13 @@
 <?php ob_start(); ?>
+<?php session_start(); ?>
 <?php include_once "../includes/db.php";?>
 <?php include_once "includes/functions.php" ?>
+
+<?php
+    if (!$_SESSION['user']) {
+        header("Location: ../index.php");
+    }
+?>
 <!DOCTYPE html>
 <html lang="en">
 

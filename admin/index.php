@@ -13,13 +13,15 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                            Blank Page
-                            <small>Subheading</small>
+                            Welcome
+                            <small><?php echo $_SESSION['user']['db_firstname']; ?></small>
                         </h1>
                         
                     </div>
                 </div>
                 <!-- /.row -->
+
+                <?php include_once './includes/admin_widgets.php'; ?>
 
             </div>
             <!-- /.container-fluid -->

@@ -408,6 +408,64 @@
 			$result = mysqli_query($connection, $query);
 
 			show_query_error($result);
-			header("Location: view_all_users.php");
 		}
+	}
+
+
+	// Login
+
+	function select_user_username_password($username, $password) {
+		global $connection;
+		$username = $_POST['username'];
+		$password = $_POST['password'];
+		$lastname = $_POST['lastname'];
+		$firstname = $_POST['firstname'];
+		$email = $_POST['email'];
+		$user_role = $_POST['user_role'];
+	}
+
+
+	// Profile
+
+	function edit_profile($id) {
+		global $connection;
+		if (isset($_POST['edit_profile'])) {
+			$username = $_POST['username'];
+			$password = $_POST['password'];
+			$lastname = $_POST['lastname'];
+			$firstname = $_POST['firstname'];
+			$email = $_POST['email'];
+			
+			$query = "UPDATE users SET ";
+			$query .= "username = '$username', ";
+			$query .= "password = '$password', ";
+			$query .= "firstname = '$firstname', ";
+			$query .= "lastname = '$lastname', ";
+			$query .= "email = '$email' ";
+			$query .= "WHERE user_id = $id";
+
+			$result = mysqli_query($connection, $query);
+
+			show_query_error($result);
+		}
+	}
+
+	function create_user_session_obj($user) {
+		$new_user = $user;
+		$new_user['db_username'] = $_POST['username'];
+		$new_user['db_password'] = $_POST['password'];
+		$new_user['db_firstname'] = $_POST['firstname'];
+		$new_user['db_email'] = $_POST['email'];
+		$new_user['db_lastname'] = $_POST['lastname'];
+		return $new_user;
+
+	}
+
+	function update_user_session() {
+		global $connection;
+		
+		$user = create_user_session_obj($_SESSION['user']);
+		$_SESSION['user'] = $user;
+		print_r($_SESSION);
+		// print_r($user);
 	}
