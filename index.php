@@ -23,33 +23,18 @@
 
                 <?php
                     $posts = select_all_posts_by_status();
+                    while($row = mysqli_fetch_assoc($posts)){
+                        $post_id = $row['post_id'];
+                        $post_title = $row['post_title'];
+                        $post_author = $row['post_author'];
+                        $post_date = $row['post_date'];
+                        $post_image = $row['post_image'];
+                        $post_content = $row['post_content'];
 
-                    while($row = mysqli_fetch_assoc($posts)):?>
-                        <?php
-                            $post_id = $row['post_id'];
-                            $post_title = $row['post_title'];
-                            $post_author = $row['post_author'];
-                            $post_date = $row['post_date'];
-                            $post_image = $row['post_image'];
-                            $post_content = $row['post_content'];
-                        ?>
+                        include './includes/post_article.php';
 
-                        <article class='mb-3'>
-                            <h2>
-                                <a href="./post.php?post_id=<?php echo $post_id ?>"><?php echo $post_title ?></a>
-                            </h2>
-                            <p class="lead">
-                                by <a href="index.php"><?php echo $post_author ?></a>
-                            </p>
-                            <p><span class="glyphicon glyphicon-time"></span> Posted on <?php echo $post_date ?></p>
-                            <hr>
-                            <img class="img-responsive" src="./images/<?php echo $post_image ?>" alt="">
-                            <hr>
-                            <p><?php echo shorten_string($post_content, 150) ?></p>
-                            <a class="btn btn-primary" href="./post.php?post_id=<?php echo $post_id ?>">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
-                        </article>
-
-                    <?php endwhile ?>
+                    }
+                ?>
             </div>
 
             <!-- Blog Sidebar Widgets Column -->

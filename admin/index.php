@@ -23,6 +23,8 @@
 
                 <?php include_once './includes/admin_widgets.php'; ?>
 
+                
+
             </div>
             <!-- /.container-fluid -->
 
@@ -31,5 +33,6 @@
 
     </div>
     <!-- /#wrapper -->
+
 
 <?php include_once 'includes/footer.php' ?>

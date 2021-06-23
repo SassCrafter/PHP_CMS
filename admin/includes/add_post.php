@@ -1,10 +1,11 @@
-<?php
+
+
+<div class="col-md-10 col-lg-6">
+	<?php
 	
 	create_post();
 	
 ?>
-
-<div class="col-md-10 col-lg-6">
 	<form action="" method='post' enctype="multipart/form-data">
 	<!-- Title -->
 	<div class="form-group">
@@ -50,8 +51,8 @@
 
 	<!-- Content -->
 	<div class="form-group">
-		<label for="post_content">Post Content</label>
-		<textarea rows='5' class='form-control' type="text" id='post_content' name='post_content' required></textarea>
+		<label for="froala">Post Content</label>
+		<textarea rows='5' class='form-control' type="text" id='froala' name='post_content' required></textarea>
 	</div>
 
 	<!-- Submit -->

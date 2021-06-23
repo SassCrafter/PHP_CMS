@@ -25,9 +25,24 @@
                             echo "<li><a href='./view_by_category.php?cat_id=$row[cat_id]'>$row[cat_title]</a></li>";
                         }
                     ?>
-                    <li>
-                        <a href="./admin/index.php">Admin</a>
-                    </li>
+
+                    <!-- Edit post if admin -->
+                    <?php
+                        if (isset($_SESSION['user']) && $_SESSION['user']['db_user_role'] === 'admin') {
+                            echo "
+                                <li>
+                                    <a href='./admin/index.php'>Admin</a>
+                                </li>
+                            ";
+                            if (isset($_GET['post_id'])) {
+                                echo "
+                                    <li>
+                                        <a href='./admin/view_all_posts.php?source=edit_post&post_id=$_GET[post_id]'>Edit Post</a>
+                                    </li>
+                                ";
+                            }
+                        }
+                    ?>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->

@@ -100,7 +100,7 @@
 
 	function select_post_by_category_id($cat_id) {
 		global $connection;
-		$select_post_query = "SELECT * FROM posts WHERE post_category_id = $cat_id";
+		$select_post_query = "SELECT * FROM posts WHERE post_category_id = $cat_id AND post_status = 'published'";
 		$select_post_result = mysqli_query($connection, $select_post_query);
 
 		show_query_error($select_post_result);
@@ -140,6 +140,15 @@
 			$create_post_result = mysqli_query($connection, $create_post_query);
 
 			show_query_error($create_post_result);
+			$get_post_query = "SELECT post_id FROM posts WHERE post_title = '$post_title' AND post_category_id = $post_category_id AND post_author = '$post_author' AND post_tags = '$post_tags'";
+			$get_post_result = mysqli_query($connection, $get_post_query);
+			show_query_error($get_post_result);
+
+			$id = mysqli_fetch_assoc($get_post_result)['post_id'];
+
+
+			$message = "Post's been successfully created.<a href='../post.php?post_id=$id'>View post</a> <a href='./view_all_posts.php'>View all posts</a>";
+			show_alert($message);
 		}
 	}
 
@@ -203,7 +212,9 @@
 
 			show_query_error($edit_post_result);
 
-			header("Location: view_all_posts.php");
+			// header("Location: view_all_posts.php");
+			$message = "Post's been successfully updated.<a href='../post.php?post_id=$id'>View post</a> or <a href='./view_all_posts.php'>View all posts</a>";
+			show_alert($message);
 		}
 	}
 
@@ -320,7 +331,7 @@
 
 	function create_user_in_admin() {
 		global $connection;
-		if (isset($_POST['create_user'])) {
+		
 			$username = $_POST['username'];
 			$password = $_POST['password'];
 			$firstname = $_POST['firstname'];
@@ -333,8 +344,7 @@
 			$result = mysqli_query($connection, $query);
 
 			show_query_error($result);
-			header("Location: view_all_users.php");
-		}
+			// header("Location: view_all_users.php");
 	}
 
 	function delete_user() {
@@ -468,4 +478,15 @@
 		$_SESSION['user'] = $user;
 		print_r($_SESSION);
 		// print_r($user);
+	}
+
+
+	// Alerts
+
+	function show_alert($message, $type = 'success') {
+		echo "  
+			<div class='alert alert-$type' role='alert'>
+			  $message
+			</div>
+		";
 	}

@@ -7,7 +7,7 @@
 <div class="col-md-4">
 
                 <?php
-                    if (!$_SESSION['user']):
+                    if (!isset($_SESSION['user'])):
                 ?>
                 <!-- Login -->
                 <div class="well">

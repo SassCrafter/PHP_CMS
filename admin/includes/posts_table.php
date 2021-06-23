@@ -1,7 +1,49 @@
+<?php
+    if (isset($_POST['checkboxArray'])) {
+        $bulk_option = $_POST['bulk_options'];
+        foreach($_POST['checkboxArray'] as $checkboxVal) {
+            $query = null;
+            switch($bulk_option) {
+                case 'published':
+                $query = "UPDATE posts SET post_status = 'published' WHERE post_id = $checkboxVal";
+                break;
+                case 'draft':
+                $query = "UPDATE posts SET post_status = 'draft' WHERE post_id = $checkboxVal";
+                break;
+                case 'delete':
+                $query = "DELETE FROM posts WHERE post_id = $checkboxVal";
+                break;
+            }
+
+            if ($query) {
+                $result = mysqli_query($connection, $query);
+                show_query_error($result);
+            }
+        }
+    }
+?>
+
+<form action="" method='post'>
+<div class="row mb-2">
+    <div class="col-xs-4">
+        <select name="bulk_options" id="bulkOptionControl" class="form-control">
+            <option value="">Select Option</option>
+            <option value="published">Publish</option>
+            <option value="draft">Draft</option>
+            <option value="delete">Delete</option>
+        </select>
+    </div>
+    <div class="col-xs-4">
+        <input type="submit" value="Apply" name='submit' class='btn btn-success'>
+        <a href="./view_all_posts.php?source=add_post" class="btn btn-primary">Add New</a>
+    </div>
+</div>
 <table class='table table-bordered'>
     <thead>
         <tr>
-            <th>Id</th>
+            <th>
+                <input type="checkbox" id='selectAllBoxes'>
+            </th>
             <th>Title</th>
             <th>Content</th>
             <th>Category</th>
@@ -30,7 +72,9 @@
                     
                 ?>
                 <tr>
-                    <td><?php echo $post_id ?></td>
+                    <td>
+                        <input type="checkbox" class='selectBox' name="checkboxArray[]" value="<?php echo $post_id ?>">
+                    </td>
                     <td>
                         <a href="../post.php?post_id=<?php echo $post_id ?>"><?php echo $post_title ?></a>
                     </td>
@@ -64,3 +108,15 @@
             <?php } ?>
     </tbody>
 </table>
+</form>
+
+<script>
+    const selectAllCheckbox = document.getElementById('selectAllBoxes');
+    const postCheckboxes = document.querySelectorAll('.selectBox');
+    
+    selectAllBoxes.addEventListener('change', () => {
+            postCheckboxes.forEach(el => {
+                el.checked = !el.checked;
+            });
+    })
+</script>

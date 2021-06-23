@@ -18,6 +18,8 @@
         // Create Comment
         create_comment($post_id);
 
+    } else {
+        header("Location: index.php");
     }
 
 
@@ -52,7 +54,7 @@
                 <hr>
 
                 <!-- Preview Image -->
-                <img class="img-responsive" src="./images/<?php echo $post_image ?>" alt="<?php echo $pots_title ?>">
+                <img class="img-responsive" src="./images/<?php echo $post_image ?>" alt="<?php echo $post_title ?>">
 
                 <hr>
 
