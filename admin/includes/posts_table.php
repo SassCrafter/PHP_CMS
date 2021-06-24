@@ -13,6 +13,9 @@
                 case 'delete':
                 $query = "DELETE FROM posts WHERE post_id = $checkboxVal";
                 break;
+                case 'clone':
+                $query = "INSERT INTO posts (post_category_id, post_title, post_author, post_date, post_image, post_content, post_tags, post_comment_count, post_status ) SELECT post_category_id, post_title, post_author, post_date, post_image, post_content, post_tags, post_comment_count, post_status FROM posts WHERE post_id = $checkboxVal";
+                break;
             }
 
             if ($query) {
@@ -31,6 +34,7 @@
             <option value="published">Publish</option>
             <option value="draft">Draft</option>
             <option value="delete">Delete</option>
+            <option value="clone">Clone</option>
         </select>
     </div>
     <div class="col-xs-4">
@@ -53,6 +57,7 @@
             <th>Comments</th>
             <th>Tags</th>
             <th>Status</th>
+            <th>Views</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -69,6 +74,7 @@
                     $post_title = shorten_string($row['post_title'], 30);
                     $post_content = shorten_string($row['post_content'], 30);
                     $post_category_id = $row['post_category_id'];
+                    $post_views_count = $row['post_views_count'];
                     
                 ?>
                 <tr>
@@ -100,9 +106,12 @@
                     <td><?php echo $row['post_comment_count'] ?></td>
                     <td><?php echo $row['post_tags'] ?></td>
                     <td><?php echo $row['post_status'] ?></td>
+                    <td><?php echo $row['post_views_count'] ?></td>
                     <td>
                         <a href="view_all_posts.php?source=edit_post&post_id=<?php echo $post_id ?>" class='mb-2 d-block'>Edit</a>
-                        <a href="view_all_posts.php?delete_id=<?php echo $post_id; ?>" class='text-danger d-block'>Delete</a>
+                        <a onClick="javascript: return confirm('Are you sure you want to reset views?');" href="view_all_posts.php?reset_id=<?php echo $post_id; ?>" class='text-warning d-block mb-2'>Reset</a>
+                        <a onClick="javascript: return confirm('Are you sure you want to delete?');" href="view_all_posts.php?delete_id=<?php echo $post_id; ?>" class='text-danger d-block'>Delete</a>
+
                     </td>
                 </tr>
             <?php } ?>

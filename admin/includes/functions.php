@@ -116,6 +116,15 @@
 		return $result;
 	}
 
+	function select_all_posts_by_author($author) {
+		global $connection;
+		$query = "SELECT * FROM posts WHERE post_author = '$author' ORDER BY DATE(post_date) DESC";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+		return $result;
+	}
+
 	function create_post() {
 		global $connection;
 		if (isset($_POST['publish_post'])) {
@@ -219,6 +228,27 @@
 	}
 
 
+	// Post Views
+
+	function increment_post_views_count($id) {
+		global $connection;
+		$query = "UPDATE posts SET post_views_count = post_views_count + 1 WHERE post_id = $id";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+	}
+
+	function reset_post_views_count() {
+		global $connection;
+		if (isset($_GET['reset_id'])) {
+			$id = $_GET['reset_id'];
+			$query = "UPDATE posts SET post_views_count = 0 WHERE post_id = $id";
+			$result = mysqli_query($connection, $query);
+
+			show_query_error($result);
+		}
+	}
+
 
 	// Comments
 
@@ -256,14 +286,19 @@
 			$email = escape_string($_POST['comment_email']);
 			$content = escape_string($_POST['comment_content']);
 
-			$query = "INSERT INTO comments (comment_post_id, comment_author, comment_email, comment_content, comment_status, comment_date) ";
-			$query .= "VALUES ($comment_post_id, '$author', '$email', '$content', 'unapproved', now())";
+			if (!empty($author) && !empty($email) && !empty($content)) {
+				$query = "INSERT INTO comments (comment_post_id, comment_author, comment_email, comment_content, comment_status, comment_date) ";
+				$query .= "VALUES ($comment_post_id, '$author', '$email', '$content', 'unapproved', now())";
 
-			$result = mysqli_query($connection, $query);
+				$result = mysqli_query($connection, $query);
 
-			show_query_error($result);
+				show_query_error($result);
 
-			increase_comment_count($comment_post_id);
+				increase_comment_count($comment_post_id);
+			} else {
+				$msg = "Fields can't be empty. Please fill all the fields below!";
+				show_alert($msg, 'danger');
+			}
 		}
 	}
 
@@ -327,6 +362,27 @@
 
 		show_query_error($result);
 		return $result;
+	}
+
+	function create_user($default_role = True) {
+		global $connection;
+		$username = escape_string($_POST['username']);
+        $email = escape_string($_POST['email']);
+        $password = escape_string($_POST['password']);
+        $firstname = escape_string($_POST['firstname']);
+		$lastname = escape_string($_POST['lastname']);
+		$user_role = $default_role ? 'admin' : $_POST['user_role'];
+
+        // Encryption
+        $salt = get_rand_salt();
+        $encrypted_password = crypt($password, $salt);
+
+        $query = "INSERT INTO users (username, password, firstname, lastname, email, user_role) VALUES ('$username', '$encrypted_password', '$firstname', '$lastname', '$email', '$user_role')";
+        $result = mysqli_query($connection, $query);
+
+        show_query_error($result);
+
+
 	}
 
 	function create_user_in_admin() {
@@ -405,10 +461,14 @@
 			$firstname = $_POST['firstname'];
 			$email = $_POST['email'];
 			$user_role = $_POST['user_role'];
+
+			// Encryption
+        	$salt = get_rand_salt();
+        	$encrypted_password = crypt($password, $salt);
 			
 			$query = "UPDATE users SET ";
 			$query .= "username = '$username', ";
-			$query .= "password = '$password', ";
+			$query .= "password = '$encrypted_password', ";
 			$query .= "firstname = '$firstname', ";
 			$query .= "lastname = '$lastname', ";
 			$query .= "email = '$email', ";
@@ -418,6 +478,8 @@
 			$result = mysqli_query($connection, $query);
 
 			show_query_error($result);
+			header("Location: view_all_users.php");
+
 		}
 	}
 
@@ -489,4 +551,20 @@
 			  $message
 			</div>
 		";
+	}
+
+	function check_form_fields_empty() {
+		return count(array_filter($_POST)) != count($_POST);
+	}
+
+	// Password encryption
+	function get_rand_salt() {
+		global $connection;
+		$query = "SELECT rand_salt FROM users";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+
+		return mysqli_fetch_assoc($result)['rand_salt'];
+
 	}

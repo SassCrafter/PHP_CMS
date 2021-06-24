@@ -27,6 +27,9 @@
     <!-- Custom CSS -->
     <link href="css/sb-admin.css" rel="stylesheet">
 
+    <!-- Loader -->
+    <link rel="stylesheet" href="./css/loader.css">
+
     <!-- Custom Fonts -->
     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 

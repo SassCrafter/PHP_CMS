@@ -43,6 +43,21 @@
                             }
                         }
                     ?>
+                    <?php
+                        if(!isset($_SESSION['user'])) {
+                            echo "
+                                <li>
+                                    <a href='./signup.php'>Signup</a>
+                                </li>
+                            ";
+                        } else {
+                            echo "
+                                <li>
+                                    <a href='./includes/logout.php'>Logout</a>
+                                </li>
+                            ";
+                        }
+                    ?>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->

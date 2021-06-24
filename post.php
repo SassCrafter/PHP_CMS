@@ -15,8 +15,7 @@
         $post_content = $post_row['post_content'];
         $post_author = $post_row['post_author'];
 
-        // Create Comment
-        create_comment($post_id);
+        increment_post_views_count($post_id);
 
     } else {
         header("Location: index.php");
@@ -68,6 +67,10 @@
                 <!-- Comments Form -->
                 <div class="well">
                     <h4>Leave a Comment:</h4>
+                    <?php 
+                        // Create Comment
+                        create_comment($post_id);
+                    ?>
                     <form role="form" action="" method='post'>
                         <div class="form-group">
                             <label for="comment-author">Name</label>

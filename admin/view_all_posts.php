@@ -1,6 +1,7 @@
 <?php include_once 'includes/header.php' ?>
 <?php delete_category()?>
 <?php delete_post() ?>
+<?php reset_post_views_count(); ?>
 
 
     <div id="wrapper">

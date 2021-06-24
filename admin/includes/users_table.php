@@ -18,7 +18,7 @@
             while($user_row = mysqli_fetch_assoc($users_result)){
                     $user_id = $user_row['user_id'];
                     $username = $user_row['username'];
-                    $password = $user_row['password'];
+                    $password = shorten_string($user_row['password'], 20);
                     $firstname = $user_row['firstname'];
                     $lastname = $user_row['lastname'];
                     $email = $user_row['email'];
@@ -39,7 +39,7 @@
                     <td><?php echo $user_role ?></td>
                     <td>
                         <a href="view_all_users.php?source=edit_user&user_id=<?php echo $user_id ?>" class='mb-2 d-block'>Edit</a>
-                        <a href="view_all_users.php?delete_id=<?php echo $user_id; ?>" class='text-danger d-block'>Delete</a>
+                        <a onClick="javascript: return confirm('Are you sure you want to delete?');" href="view_all_users.php?delete_id=<?php echo $user_id; ?>" class='text-danger d-block'>Delete</a>
                     </td>
                 </tr>
             <?php } ?>

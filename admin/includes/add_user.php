@@ -3,7 +3,7 @@
 <div class="col-md-10 col-lg-6">
 	<?php 
 	if (isset($_POST['create_user'])) {
-		create_user_in_admin();
+		create_user(false);
 		$message = "User's been successfully created. <a href='./view_all_users.php'>View all users</a>";
 		show_alert($message);
 	}

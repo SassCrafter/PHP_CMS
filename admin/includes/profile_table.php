@@ -17,7 +17,7 @@
     <tbody>     
         <tr>
             <td><?php echo $db_username ?></td>
-            <td><?php echo $db_password ?></td>
+            <td><?php echo shorten_string($db_password, 20) ?></td>
             <td><?php echo $db_firstname ?></td>
             <td><?php echo $db_lastname ?></td>
             <td><?php echo $db_email ?></td>

@@ -7,7 +7,8 @@ if (isset($_POST['login'])) {
 	$username = escape_string($_POST['login_username']);
 	$password = escape_string($_POST['login_password']);
 
-	$query = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+
+	$query = "SELECT * FROM users WHERE username = '$username'";
 	$result = mysqli_query($connection, $query);
 
 	show_query_error($result);
@@ -20,13 +21,21 @@ if (isset($_POST['login'])) {
 		$user['db_email'] = $row['email'];
 		$user['db_lastname'] = $row['lastname'];
 		$user['db_user_role'] = $row['user_role'];
-	}
-	print_r($user);
 
-	if ($user['db_username'] === $username && $user['db_password'] === $password && $user['db_user_role'] === 'admin') {
+		$password = crypt($password,$user['db_password']);
+
+
+	}
+
+	if ($user['db_username'] === $username && $user['db_password'] == $password) {
 		$_SESSION['user'] = $user;
-		header("Location: ../admin/index.php");
-	} else {
+
+		if ($user['db_user_role'] === 'admin') {
+			header("Location: ../admin/index.php");
+		}
 		header("Location: ../index.php");
+	} else {
+		// header("Location: ../index.php");
+		echo $password;
 	}
 }
