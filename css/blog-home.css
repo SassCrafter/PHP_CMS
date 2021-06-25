@@ -16,3 +16,8 @@ footer {
 	display: flex;
 	flex-wrap: wrap;
 }
+
+.pager-active a {
+	background-color: #337ab7 !important;
+	color: white !important;
+}

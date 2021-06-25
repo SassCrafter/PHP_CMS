@@ -12,6 +12,11 @@
             <!-- Top Menu Items -->
             <ul class="nav navbar-right top-nav">
                 <li>
+                    <a href="">
+                        Users online: <span id='users-online'></span>
+                    </a>
+                </li>
+                <li>
                     <a href="../index.php">Website</a>
                 </li>
                 <li class="dropdown">

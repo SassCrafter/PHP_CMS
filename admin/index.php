@@ -1,5 +1,9 @@
 <?php include_once 'includes/header.php' ?>
 
+<?php
+    
+?>
+
     <div id="wrapper">
 
         <!-- Navigation -->
@@ -13,7 +17,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                            Welcome
+                            Welcome 
                             <small><?php echo $_SESSION['user']['db_firstname']; ?></small>
                         </h1>
                         

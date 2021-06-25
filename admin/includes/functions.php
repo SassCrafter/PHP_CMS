@@ -125,6 +125,29 @@
 		return $result;
 	}
 
+
+	function select_posts_per_page() {
+		global $connection;
+		if (isset($_GET['page'])) {
+			$page = $_GET['page'];
+		} else {
+			$page = '';
+		}
+
+		if ($page === '' || $page == 1) {
+			$page_num = 0;
+		} else {
+			$page_num = ($page * 5) - 5;
+		}
+
+		$query = "SELECT * FROM posts WHERE post_status = 'published' LIMIT $page_num, 5";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+
+		return $result;
+	}
+
 	function create_post() {
 		global $connection;
 		if (isset($_POST['publish_post'])) {
@@ -225,6 +248,12 @@
 			$message = "Post's been successfully updated.<a href='../post.php?post_id=$id'>View post</a> or <a href='./view_all_posts.php'>View all posts</a>";
 			show_alert($message);
 		}
+	}
+
+	function posts_quantity() {		
+		$result = select_all_posts_by_status();
+
+		return mysqli_num_rows($result);
 	}
 
 
@@ -568,3 +597,33 @@
 		return mysqli_fetch_assoc($result)['rand_salt'];
 
 	}
+
+
+	// Users online
+
+	function users_online() {
+
+		if (isset($_GET['usersonline'])) {
+			session_start();
+			include_once '../../includes/db.php';
+			$session = session_id();
+		    $time = time();
+		    $timeout_in_sec = 60;
+		    $timeout = $time - $timeout_in_sec;
+
+		    $query = "SELECT * FROM users_online WHERE session = '$session'";
+		    $send_query = mysqli_query($connection, $query);
+		    $count = mysqli_num_rows($send_query);
+
+		    if ($count == NULL) {
+		        mysqli_query($connection, "INSERT INTO users_online (session, time) VALUES ('$session', '$time')");
+		    } else {
+		        mysqli_query($connection, "UPDATE users_online SET time = '$time' WHERE session = '$session'");
+		    }
+
+		    $users_online_query = mysqli_query($connection, "SELECT * FROM users_online WHERE time > $timeout");
+		    echo mysqli_num_rows($users_online_query);
+		}
+	}
+
+	users_online();

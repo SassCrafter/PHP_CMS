@@ -2,7 +2,7 @@
     include_once "includes/db.php";
     include_once "includes/header.php";
 ?>
-	
+
 
     <!-- Navigation -->
     <?php include_once "includes/navigation.php" ?>
@@ -22,15 +22,7 @@
                 <!-- Posts -->
 
                 <?php
-                	if (isset($_GET['page'])) {
-                		$page_num = $_GET['page'];
-                	} else {
-                		$page_num = 1;
-                	}
-                	$posts_num = posts_quantity();
-                	$page_count = ceil($posts_num / 5);
-                	
-                    $posts = select_posts_per_page();
+                    $posts = select_all_posts_by_status();
                     while($row = mysqli_fetch_assoc($posts)){
                         $post_id = $row['post_id'];
                         $post_title = $row['post_title'];
@@ -43,13 +35,10 @@
 
                     }
                 ?>
-                <?php include_once './includes/pager.php' ?>
             </div>
 
             <!-- Blog Sidebar Widgets Column -->
             <?php include_once 'includes/sidebar.php' ?>
-
-            
 
         </div>
         <!-- /.row -->
