@@ -93,6 +93,16 @@
 
 	}
 
+	function select_all_posts_by_user_id($user_id) {
+		global $connection;
+		$post_query = "SELECT * FROM posts WHERE post_user_id = $user_id ORDER BY post_date DESC";
+        $posts_result = mysqli_query($connection, $post_query);
+
+        show_query_error($posts_result);
+
+        return $posts_result;
+	}
+
 	function select_post_by_id($id) {
 		global $connection;
 		$select_post_query = "SELECT * FROM posts WHERE post_id = $id";

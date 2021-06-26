@@ -24,6 +24,12 @@
             }
         }
     }
+
+    if (isset($_GET['user_id'])) {
+        $link_to_all_posts = "<a href='./view_all_posts.php' class='btn btn-link'>View all posts</a>";
+    } else {
+        $link_to_all_posts = NULL;
+    }
 ?>
 
 <form action="" method='post'>
@@ -37,9 +43,10 @@
             <option value="clone">Clone</option>
         </select>
     </div>
-    <div class="col-xs-4">
+    <div class="col-xs-8">
         <input type="submit" value="Apply" name='submit' class='btn btn-success'>
         <a href="./view_all_posts.php?source=add_post" class="btn btn-primary">Add New</a>
+        <?php echo $link_to_all_posts ?>
     </div>
 </div>
 <table class='table table-bordered'>
@@ -64,7 +71,12 @@
     </thead>
     <tbody>
         <?php
-            $get_posts_result = select_all_posts();
+            if (isset($_GET['user_id'])) {
+                $user_id = $_GET['user_id'];
+                $get_posts_result = select_all_posts_by_user_id($user_id);
+            } else {
+                $get_posts_result = select_all_posts();
+            }
             while($row = mysqli_fetch_assoc($get_posts_result)){
                     $post_id = $row['post_id'];
                     $post_title = shorten_string($row['post_title'], 30);
@@ -98,7 +110,9 @@
 
 
                     <td><?php echo $row['post_author'] ?></td>
-                    <td><?php echo $user_created ?></td>
+                    <td>
+                        <a href="./view_posts_by_user.php?user_id=<?php echo $row['post_user_id'] ?>"><?php echo $user_created ?></a>
+                    </td>
                     <td>
                         <img width='100' style='max-height: 100px;' src="../images/<?php echo $row['post_image']?>" alt="image">
                     </td>
@@ -111,7 +125,9 @@
                     <td><?php echo $row['post_views_count'] ?></td>
                     <td>
                         <a href="view_all_posts.php?source=edit_post&post_id=<?php echo $post_id ?>" class='mb-2 d-block'>Edit</a>
-                        <a onClick="javascript: return confirm('Are you sure you want to reset views?');" href="view_all_posts.php?reset_id=<?php echo $post_id; ?>" class='text-warning d-block mb-2'>Reset</a>
+
+                        <a onClick="javascript: return confirm('Are you sure you want to reset views?');" href="view_posts_by_user.php?user_id=<?php echo $user_id ?>&reset_id=<?php echo $post_id; ?>" class='text-warning d-block mb-2'>Reset</a>
+                        
                         <a onClick="javascript: return confirm('Are you sure you want to delete?');" href="view_all_posts.php?delete_id=<?php echo $post_id; ?>" class='text-danger d-block'>Delete</a>
 
                     </td>
