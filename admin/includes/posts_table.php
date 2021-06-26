@@ -52,6 +52,7 @@
             <th>Content</th>
             <th>Category</th>
             <th>Author</th>
+            <th>User</th>
             <th>Image</th>
             <th>Date</th>
             <th>Comments</th>
@@ -63,19 +64,17 @@
     </thead>
     <tbody>
         <?php
-            $get_posts_query = "SELECT * FROM posts";
-            $get_posts_result = mysqli_query($connection, $get_posts_query);
-
-            if (!$get_posts_result) {
-                die("Failed to load posts" . mysqli_error($connection));
-            }
+            $get_posts_result = select_all_posts();
             while($row = mysqli_fetch_assoc($get_posts_result)){
                     $post_id = $row['post_id'];
                     $post_title = shorten_string($row['post_title'], 30);
                     $post_content = shorten_string($row['post_content'], 30);
                     $post_category_id = $row['post_category_id'];
                     $post_views_count = $row['post_views_count'];
-                    
+
+                    $user_created_result = select_user_by_id($row['post_user_id']);
+                    $user_row = mysqli_fetch_array($user_created_result);
+                    $user_created = isset($user_row['username']) ? $user_row['username'] : "Unknown";
                 ?>
                 <tr>
                     <td>
@@ -99,11 +98,14 @@
 
 
                     <td><?php echo $row['post_author'] ?></td>
+                    <td><?php echo $user_created ?></td>
                     <td>
                         <img width='100' style='max-height: 100px;' src="../images/<?php echo $row['post_image']?>" alt="image">
                     </td>
                     <td><?php echo $row['post_date'] ?></td>
-                    <td><?php echo $row['post_comment_count'] ?></td>
+                    <td>
+                        <a href="./view_post_comments.php?post_id=<?php echo $post_id ?>"><?php echo count_comments_for_post($post_id); ?></a>
+                    </td>
                     <td><?php echo $row['post_tags'] ?></td>
                     <td><?php echo $row['post_status'] ?></td>
                     <td><?php echo $row['post_views_count'] ?></td>

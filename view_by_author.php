@@ -24,7 +24,8 @@
                 <?php
                     if (isset($_GET['author_name'])) {
                         $author_name = $_GET['author_name'];
-                        $posts = select_all_posts_by_author($author_name);
+                        $posts = select_posts_per_page_by_author($author_name);
+                        extract(prepare_page_posts(posts_quantity('by_author', $author_name)));
 
                         if (mysqli_num_rows($posts) == 0) {
                             echo "<h2>No posts found!</h2>";
@@ -45,7 +46,8 @@
                         header("Location: index.php");
                     }
                     ?>
-                    
+                    <?php $page_url = "./view_by_author.php?author_name=$author_name" ?>
+                    <?php include_once './includes/pager.php' ?>
             </div>
 
             <!-- Blog Sidebar Widgets Column -->

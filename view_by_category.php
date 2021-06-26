@@ -22,9 +22,11 @@
                 <!-- Posts -->
 
                 <?php
+                   
                     if (isset($_GET['cat_id'])) {
                         $cat_id = $_GET['cat_id'];
-                        $posts = select_post_by_category_id($cat_id);
+                        $posts = select_posts_per_page_by_category($cat_id);
+                        extract(prepare_page_posts(posts_quantity('by_category', $cat_id)));
 
                         if (mysqli_num_rows($posts) == 0) {
                             echo "<h2>No posts found!</h2>";
@@ -45,7 +47,8 @@
                         header("Location: index.php");
                     }
                     ?>
-                    
+                    <?php $page_url = "./view_by_category.php?cat_id=$cat_id"; ?>
+                    <?php include_once './includes/pager.php' ?>
             </div>
 
             <!-- Blog Sidebar Widgets Column -->

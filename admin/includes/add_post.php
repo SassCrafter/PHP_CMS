@@ -34,6 +34,24 @@
 		<input class='form-control' type="text" id='post_author' name='post_author' required >
 	</div>
 
+	<!-- User ID -->
+	<div class="form-group">
+		<label for="post_user_id">User</label>
+		
+		<select class='form-control' name="post_user_id" id="post_user_id">
+			<?php
+				$admin_users_result = select_all_admin_users();
+				while ($user_row = mysqli_fetch_assoc($admin_users_result)) {
+					$active = '';
+					if ($user_row[user_id] == $_SESSION['user']['db_user_id']) {
+						$active = 'selected';
+					}
+					echo "<option value='$user_row[user_id]' $active>$user_row[username]</option>";
+				}
+			?>
+		</select>
+	</div>
+
 	<!-- Status -->
 	<?php include_once './includes/edit_post_status.php' ?>
 

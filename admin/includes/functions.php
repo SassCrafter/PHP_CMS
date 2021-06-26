@@ -21,6 +21,10 @@
         return $result;
 	}
 
+	function check_if_has_question_mark($str) {
+		return strpos($str, '?') !== false;
+	}
+
 	// Categories
 
 	function select_all_categories() {
@@ -79,7 +83,7 @@
 	// Posts
 	function select_all_posts() {
 		global $connection;
-		$post_query = "SELECT * FROM posts";
+		$post_query = "SELECT * FROM posts ORDER BY post_date DESC";
         $posts_result = mysqli_query($connection, $post_query);
 
         show_query_error($posts_result);
@@ -98,11 +102,20 @@
 		return $select_post_result;
 	}
 
-	function select_post_by_category_id($cat_id) {
+	function select_post_title_by_id($id) {
 		global $connection;
-		$select_post_query = "SELECT * FROM posts WHERE post_category_id = $cat_id AND post_status = 'published'";
+		$select_post_query = "SELECT post_title FROM posts WHERE post_id = $id";
 		$select_post_result = mysqli_query($connection, $select_post_query);
 
+		show_query_error($select_post_result);
+		return $select_post_result;
+	}
+
+	function select_post_by_category_id($cat_id) {
+		global $connection;
+		$select_post_query = "SELECT * FROM posts WHERE post_category_id = '$cat_id'AND post_status = 'published'";
+		$select_post_result = mysqli_query($connection, $select_post_query);
+		
 		show_query_error($select_post_result);
 		return $select_post_result;
 	}
@@ -126,7 +139,7 @@
 	}
 
 
-	function select_posts_per_page() {
+	function select_posts_per_page($search_query = NULL) {
 		global $connection;
 		if (isset($_GET['page'])) {
 			$page = $_GET['page'];
@@ -140,7 +153,15 @@
 			$page_num = ($page * 5) - 5;
 		}
 
-		$query = "SELECT * FROM posts WHERE post_status = 'published' LIMIT $page_num, 5";
+		if (!$search_query) {
+			$query = "SELECT * FROM posts WHERE post_status = 'published'";
+		} else {
+			$query = $search_query;
+		}
+
+		$query .=  " ORDER BY post_date DESC LIMIT $page_num, 5";
+		// $query .= " ";
+		echo $query;
 		$result = mysqli_query($connection, $query);
 
 		show_query_error($result);
@@ -148,12 +169,58 @@
 		return $result;
 	}
 
+	function select_posts_per_page_by_category($cat_id) {
+		$query = "SELECT * FROM posts WHERE post_category_id = $cat_id AND post_status = 'published'";
+		return select_posts_per_page($query);
+	}
+
+	function select_posts_per_page_by_author($author) {
+		$query = "SELECT * FROM posts WHERE post_author = '$author' AND post_status = 'published'";
+		return select_posts_per_page($query);
+	}
+
+
+	function prepare_page_posts($quantity) {
+		if (isset($_GET['page'])) {
+    		$page_num = $_GET['page'];
+    	} else {
+    		$page_num = 1;
+    	}
+    	$posts_num = $quantity;
+    	$page_count = ceil($posts_num / 5);
+    	return ['page_num' => $page_num, 'posts_num' => $posts_num, 'page_count' => $page_count];
+	}
+
+	function posts_quantity($source = '', $val = NULL) {		
+		
+		switch ($source) {
+
+			case 'by_category':
+			$result = select_post_by_category_id($val);
+			break;
+
+			case 'by_author':
+			$result = select_all_posts_by_author($val);
+			break;
+
+			default:
+			$result = select_all_posts_by_status();
+			break;
+		}
+
+		
+
+		return mysqli_num_rows($result);
+	}
+
+
 	function create_post() {
 		global $connection;
 		if (isset($_POST['publish_post'])) {
 			$post_title = escape_string($_POST['post_title']);
 			$post_category_id = escape_string($_POST['post_category_id']);
 			$post_author = escape_string($_POST['post_author']);
+			$post_user_id = escape_string($_POST['post_user_id']);
 			$post_status = escape_string($_POST['post_status']);
 
 			$post_image = $_FILES['post_image']['name'];
@@ -167,7 +234,7 @@
 			// Move uploaded image
 			move_uploaded_file($post_image_temp, "../images/$post_image");
 
-			$create_post_query = "INSERT INTO posts (post_category_id, post_title, post_author, post_date, post_image, post_content, post_tags, post_comment_count, post_status) VALUES ($post_category_id, '$post_title', '$post_author', now(), '$post_image', '$post_content', '$post_tags', '$post_comment_count', '$post_status')";
+			$create_post_query = "INSERT INTO posts (post_category_id, post_title, post_author, post_user_id, post_date, post_image, post_content, post_tags, post_comment_count, post_status) VALUES ($post_category_id, '$post_title', '$post_author', $post_user_id, now(), '$post_image', '$post_content', '$post_tags', '$post_comment_count', '$post_status')";
 
 			$create_post_result = mysqli_query($connection, $create_post_query);
 
@@ -205,6 +272,7 @@
 			$post_title = escape_string($_POST['post_title']);
 			$post_category_id = escape_string($_POST['post_category_id']);
 			$post_author = escape_string($_POST['post_author']);
+			$post_user_id = escape_string($_POST['post_user_id']);
 			$post_status = escape_string($_POST['post_status']);
 
 			$post_image = $_FILES['post_image']['name'];
@@ -234,6 +302,7 @@
 			$edit_post_query .= "post_category_id = '$post_category_id', ";
 			$edit_post_query .= "post_date = now(), ";
 			$edit_post_query .= "post_author = '$post_author', ";
+			$edit_post_query .= "post_user_id = $post_user_id, ";
 			$edit_post_query .= "post_status = '$post_status', ";
 			$edit_post_query .= "post_tags = '$post_tags', ";
 			$edit_post_query .= "post_content = '$post_content', ";
@@ -250,11 +319,7 @@
 		}
 	}
 
-	function posts_quantity() {		
-		$result = select_all_posts_by_status();
-
-		return mysqli_num_rows($result);
-	}
+	
 
 
 	// Post Views
@@ -290,6 +355,15 @@
 		return $comments_result;
 	}
 
+	function select_comments_for_post($post_id) {
+		global $connection;
+		$query = "SELECT * FROM comments WHERE comment_post_id = $post_id ORDER BY comment_id DESC";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+		return $result;
+	}
+
 	function select_all_comments_desc() {
 		global $connection;
 		$comments_query = "SELECT * FROM comments ORDER BY comment_id DESC";
@@ -305,6 +379,15 @@
 		$result = mysqli_query($connection, $query);
 
 		show_query_error($result);
+	}
+
+	function count_comments_for_post($post_id) {
+		global $connection;
+		$query = "SELECT * FROM comments WHERE comment_post_id = $post_id";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+		return mysqli_num_rows($result);
 	}
 
 	function create_comment($post_id) {
@@ -331,7 +414,7 @@
 		}
 	}
 
-	function delete_comment() {
+	function delete_comment($header_url = 'view_all_comments.php') {
 		global $connection;
 		if (isset($_GET['delete_id'])) {
 			$delete_id = $_GET['delete_id'];
@@ -341,11 +424,11 @@
 
 			show_query_error($delete_result);
 
-			header("Location: view_all_comments.php");
+			header("Location: $header_url");
 		}
 	}
 
-	function approve_comment() {
+	function approve_comment($header_url = 'view_all_comments.php') {
 		global $connection;
 		if (isset($_GET['approve'])) {
 			$comment_id = $_GET['approve'];
@@ -353,11 +436,11 @@
 			$result = mysqli_query($connection, $query);
 
 			show_query_error($result);
-			header("Location: view_all_comments.php");
+			header("Location: $header_url");
 		}
 	}
 
-	function unapprove_comment() {
+	function unapprove_comment($header_url = 'view_all_comments.php') {
 		global $connection;
 		if (isset($_GET['unapprove'])) {
 			$comment_id = $_GET['unapprove'];
@@ -365,7 +448,7 @@
 			$result = mysqli_query($connection, $query);
 
 			show_query_error($result);
-			header("Location: view_all_comments.php");
+			header("Location: $header_url");
 		}
 	}
 
@@ -384,9 +467,25 @@
 
 	// Users
 
-	function select_all_users() {
+	function select_all_users($where = NULL) {
 		global $connection;
 		$query = "SELECT * FROM users";
+		if ($where) {
+			$query .= $where;
+		}
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+		return $result;
+	}
+
+	function select_all_admin_users() {
+		return select_all_users(" WHERE user_role = 'admin'");
+	}
+
+	function select_user_by_id($id) {
+		global $connection;
+		$query = "SELECT * FROM users WHERE user_id = $id";
 		$result = mysqli_query($connection, $query);
 
 		show_query_error($result);
@@ -403,8 +502,8 @@
 		$user_role = $default_role ? 'admin' : $_POST['user_role'];
 
         // Encryption
-        $salt = get_rand_salt();
-        $encrypted_password = crypt($password, $salt);
+        // $salt = get_rand_salt();
+        $encrypted_password = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 
         $query = "INSERT INTO users (username, password, firstname, lastname, email, user_role) VALUES ('$username', '$encrypted_password', '$firstname', '$lastname', '$email', '$user_role')";
         $result = mysqli_query($connection, $query);
@@ -446,14 +545,7 @@
 		}
 	}
 
-	function select_user_by_id($id) {
-		global $connection;
-		$query = "SELECT * FROM users WHERE user_id = $id";
-		$result = mysqli_query($connection, $query);
-
-		show_query_error($result);
-		return $result;
-	}
+	
 
 
 	function display_role_select($show_selected = False, $active_role = '') {
@@ -492,8 +584,7 @@
 			$user_role = $_POST['user_role'];
 
 			// Encryption
-        	$salt = get_rand_salt();
-        	$encrypted_password = crypt($password, $salt);
+        	$encrypted_password = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 			
 			$query = "UPDATE users SET ";
 			$query .= "username = '$username', ";

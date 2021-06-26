@@ -22,15 +22,10 @@
                 <!-- Posts -->
 
                 <?php
-                	if (isset($_GET['page'])) {
-                		$page_num = $_GET['page'];
-                	} else {
-                		$page_num = 1;
-                	}
-                	$posts_num = posts_quantity();
-                	$page_count = ceil($posts_num / 5);
                 	
+                	 echo check_if_has_question_mark('./index.php?hello');
                     $posts = select_posts_per_page();
+                    extract(prepare_page_posts(posts_quantity()));
                     while($row = mysqli_fetch_assoc($posts)){
                         $post_id = $row['post_id'];
                         $post_title = $row['post_title'];
@@ -43,6 +38,7 @@
 
                     }
                 ?>
+                <?php $page_url = "./index.php" ?>
                 <?php include_once './includes/pager.php' ?>
             </div>
 

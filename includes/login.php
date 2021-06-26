@@ -22,12 +22,12 @@ if (isset($_POST['login'])) {
 		$user['db_lastname'] = $row['lastname'];
 		$user['db_user_role'] = $row['user_role'];
 
-		$password = crypt($password,$user['db_password']);
+		// $password = crypt($password,$user['db_password']);
 
 
 	}
 
-	if ($user['db_username'] === $username && $user['db_password'] == $password) {
+	if (password_verify($password, $user['db_password'])) {
 		$_SESSION['user'] = $user;
 
 		if ($user['db_user_role'] === 'admin') {
@@ -35,7 +35,9 @@ if (isset($_POST['login'])) {
 		}
 		header("Location: ../index.php");
 	} else {
-		// header("Location: ../index.php");
-		echo $password;
+		header("Location: ../index.php");	
+		// echo password_verify($password, $row['password'])
+
+		
 	}
 }
