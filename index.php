@@ -14,28 +14,34 @@
 
             <!-- Blog Entries Column -->
             <div class="col-md-8">
-                <h1 class="page-header">
-                    Page Heading
-                    <small>Secondary Text</small>
-                </h1>
+                
 
                 <!-- Posts -->
+                <?php echo basename($_SERVER['PHP_SELF']); ?>
 
                 <?php
-                	
-                	 echo check_if_has_question_mark('./index.php?hello');
-                    $posts = select_posts_per_page();
-                    extract(prepare_page_posts(posts_quantity()));
-                    while($row = mysqli_fetch_assoc($posts)){
-                        $post_id = $row['post_id'];
-                        $post_title = $row['post_title'];
-                        $post_author = $row['post_author'];
-                        $post_date = $row['post_date'];
-                        $post_image = $row['post_image'];
-                        $post_content = $row['post_content'];
+                	if (is_admin()) {
+                        $posts = select_all_posts_per_page();
+                        extract(prepare_page_posts(posts_quantity('all')));
+                    } else {
+                        $posts = select_posts_per_page();
+                        extract(prepare_page_posts(posts_quantity()));
+                    }
+                    
+                    if ($page_count == 0) {
+                        echo "<h1>No posts available</h1>";
+                    } else {
+                        while($row = mysqli_fetch_assoc($posts)){
+                            $post_id = $row['post_id'];
+                            $post_title = $row['post_title'];
+                            $post_author = $row['post_author'];
+                            $post_date = $row['post_date'];
+                            $post_image = $row['post_image'];
+                            $post_content = $row['post_content'];
 
-                        include './includes/post_article.php';
+                            include './includes/post_article.php';
 
+                        }
                     }
                 ?>
                 <?php $page_url = "./index.php" ?>

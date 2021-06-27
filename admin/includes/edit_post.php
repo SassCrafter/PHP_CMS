@@ -3,7 +3,7 @@
 <div class="col-md-10 col-lg-6">
 	<?php
 		if (isset($_GET['post_id'])) {
-			$post_id = $_GET['post_id'];
+			$post_id = escape_string($_GET['post_id']);
 
 			edit_post($post_id);
 

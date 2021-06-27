@@ -22,9 +22,25 @@
                         $categories = mysqli_query($connection, $categories_query);
 
                         while($row = mysqli_fetch_assoc($categories)) {
-                            echo "<li><a href='./view_by_category.php?cat_id=$row[cat_id]'>$row[cat_title]</a></li>";
+                            $db_cat_id = $row['cat_id'];
+                            $cat_class = '';
+                            $signup_class = '';
+                            $contact_class = '';
+                            $page_name = basename($_SERVER['PHP_SELF']);
+
+                            if (isset($_GET['cat_id']) && $_GET['cat_id'] == $db_cat_id) {
+                                $cat_class = 'active';
+                            } else if ($page_name == 'signup.php') {
+                                $signup_class = 'active';
+                            } else if ($page_name == 'contact.php') {
+                                $contact_class = 'active';
+                            }
+                            echo "<li class='$cat_class'><a href='./view_by_category.php?cat_id=$db_cat_id' >$row[cat_title]</a></li>";
                         }
                     ?>
+                    <li class="<?php echo $contact_class; ?>">
+                        <a href="./contact.php">Contact</a>
+                    </li>
 
                     <!-- Edit post if admin -->
                     <?php
@@ -46,7 +62,7 @@
                     <?php
                         if(!isset($_SESSION['user'])) {
                             echo "
-                                <li>
+                                <li class='$signup_class'>
                                     <a href='./signup.php'>Signup</a>
                                 </li>
                             ";

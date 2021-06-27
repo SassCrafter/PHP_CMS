@@ -14,7 +14,7 @@
                 $query = "DELETE FROM posts WHERE post_id = $checkboxVal";
                 break;
                 case 'clone':
-                $query = "INSERT INTO posts (post_category_id, post_title, post_author, post_date, post_image, post_content, post_tags, post_comment_count, post_status ) SELECT post_category_id, post_title, post_author, post_date, post_image, post_content, post_tags, post_comment_count, post_status FROM posts WHERE post_id = $checkboxVal";
+                $query = "INSERT INTO posts (post_category_id, post_title, post_author, post_user_id, post_date, post_image, post_content, post_tags, post_comment_count, post_status ) SELECT post_category_id, post_title, post_author, post_user_id, post_date, post_image, post_content, post_tags, post_comment_count, post_status FROM posts WHERE post_id = $checkboxVal";
                 break;
             }
 
@@ -72,13 +72,13 @@
     <tbody>
         <?php
             if (isset($_GET['user_id'])) {
-                $user_id = $_GET['user_id'];
+                $user_id = escape_string($_GET['user_id']);
                 $get_posts_result = select_all_posts_by_user_id($user_id);
             } else {
                 $get_posts_result = select_all_posts();
             }
             while($row = mysqli_fetch_assoc($get_posts_result)){
-                    $post_id = $row['post_id'];
+                    $post_id = escape_string($row['post_id']);
                     $post_title = shorten_string($row['post_title'], 30);
                     $post_content = shorten_string($row['post_content'], 30);
                     $post_category_id = $row['post_category_id'];
@@ -127,7 +127,7 @@
                         <a href="view_all_posts.php?source=edit_post&post_id=<?php echo $post_id ?>" class='mb-2 d-block'>Edit</a>
 
                         <a onClick="javascript: return confirm('Are you sure you want to reset views?');" href="view_posts_by_user.php?user_id=<?php echo $user_id ?>&reset_id=<?php echo $post_id; ?>" class='text-warning d-block mb-2'>Reset</a>
-                        
+
                         <a onClick="javascript: return confirm('Are you sure you want to delete?');" href="view_all_posts.php?delete_id=<?php echo $post_id; ?>" class='text-danger d-block'>Delete</a>
 
                     </td>

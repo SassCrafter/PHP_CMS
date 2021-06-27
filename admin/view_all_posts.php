@@ -3,7 +3,7 @@
 <?php delete_post() ?>
 <?php reset_post_views_count(); ?>
 
-
+    
     <div id="wrapper">
 
         <!-- Navigation -->
@@ -11,7 +11,6 @@
         
 
         <div id="page-wrapper">
-
             <div class="container-fluid">
 
                 <!-- Page Heading -->
@@ -29,9 +28,10 @@
                 <div class="row">
                     <div class="col-lg-12">
 <?php
+   
     $source = '';
     if (isset($_GET['source'])) {
-        $source = $_GET['source'];
+        $source = escape_string($_GET['source']);
     }
 
     switch($source) {

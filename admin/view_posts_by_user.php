@@ -9,9 +9,9 @@
         <?php include_once 'includes/navigation.php' ?>
         <?php
             if (isset($_GET['user_id'])) {
-                $user_result = select_user_by_id($_GET['user_id']);
+                $user_result = select_user_by_id(escape_string($_GET['user_id']));
                 $user_row = mysqli_fetch_array($user_result);
-                $username = isset($user_row['username']) ? $user_row['username'] : '';
+                $username = isset($user_row['username']) ? escape_string($user_row['username']) : '';
             } else {
                 header("Location: ./view_all_posts.php");
             }

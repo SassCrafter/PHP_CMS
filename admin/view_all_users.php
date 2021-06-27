@@ -28,7 +28,7 @@
 <?php
     $source = '';
     if (isset($_GET['source'])) {
-        $source = $_GET['source'];
+        $source = escape_string($_GET['source']);
     }
 
     switch($source) {

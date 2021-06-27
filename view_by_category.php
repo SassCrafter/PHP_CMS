@@ -14,22 +14,26 @@
 
             <!-- Blog Entries Column -->
             <div class="col-md-8">
-                <h1 class="page-header">
-                    Page Heading
-                    <small>Secondary Text</small>
-                </h1>
+                <?php echo basename($_SERVER['PHP_SELF']); ?>
 
                 <!-- Posts -->
 
                 <?php
                    
                     if (isset($_GET['cat_id'])) {
-                        $cat_id = $_GET['cat_id'];
-                        $posts = select_posts_per_page_by_category($cat_id);
-                        extract(prepare_page_posts(posts_quantity('by_category', $cat_id)));
+                        $cat_id = escape_string($_GET['cat_id']);
 
-                        if (mysqli_num_rows($posts) == 0) {
-                            echo "<h2>No posts found!</h2>";
+                        if (is_admin()) {
+                            $posts = select_posts_per_page_by_category($cat_id, false);
+                            extract(prepare_page_posts(posts_quantity('by_category_no_status', $cat_id)));
+                        } else {
+                            $posts = select_posts_per_page_by_category($cat_id);
+                            extract(prepare_page_posts(posts_quantity('by_category', $cat_id)));
+                        }
+                        
+
+                        if ($page_count == 0) {
+                            echo "<h1>No posts available!</h1>";
                         } else {
                             while($row = mysqli_fetch_assoc($posts)){
                                 $post_id = $row['post_id'];

@@ -1,6 +1,6 @@
 <?php
 	if (isset($_GET['user_id'])) {
-		$user_id = $_GET['user_id'];
+		$user_id = escape_string($_GET['user_id']);
 		$user = mysqli_fetch_assoc(select_user_by_id($user_id));
 		$username = $user['username'];
 		$password = $user['password'];

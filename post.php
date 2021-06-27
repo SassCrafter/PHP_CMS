@@ -4,7 +4,7 @@
 ?>
 <?php
     if (isset($_GET['post_id'])) {
-        $post_id = $_GET['post_id'];
+        $post_id = escape_string($_GET['post_id']);
         $post_result = select_post_by_id($post_id);
         $post_row = mysqli_fetch_assoc($post_result);
 

@@ -14,7 +14,7 @@
         <?php
             
             if (isset($_GET['post_id'])) {
-                $post_id = $_GET['post_id'];
+                $post_id = escape_string($_GET['post_id']);
                 $comments = select_comments_for_post($post_id);
             } else {
                 echo "<h1>NO post_id</h1>";

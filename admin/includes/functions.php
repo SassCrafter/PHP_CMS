@@ -9,7 +9,7 @@
 
 	function escape_string($str) {
 		global $connection;
-		return mysqli_real_escape_string($connection, $str);
+		return mysqli_real_escape_string($connection, trim($str));
 	}
 
 
@@ -23,6 +23,10 @@
 
 	function check_if_has_question_mark($str) {
 		return strpos($str, '?') !== false;
+	}
+
+	function count_rows($result) {
+		return mysqli_num_rows($result);
 	}
 
 	// Categories
@@ -68,7 +72,7 @@
 	function delete_category() {
 		global $connection;
 		if (isset($_GET['delete'])) {
-	        $delete_id = $_GET['delete'];
+	        $delete_id = escape_string($_GET['delete']);
 	        $delete_query = "DELETE FROM categories WHERE cat_id = $delete_id";
 	        $delete_result = mysqli_query($connection, $delete_query);
 
@@ -121,9 +125,12 @@
 		return $select_post_result;
 	}
 
-	function select_post_by_category_id($cat_id) {
+	function select_post_by_category_id($cat_id, $published = true) {
 		global $connection;
-		$select_post_query = "SELECT * FROM posts WHERE post_category_id = '$cat_id'AND post_status = 'published'";
+		$select_post_query = "SELECT * FROM posts WHERE post_category_id = '$cat_id'";
+		if ($published) {
+			$select_post_query .= " AND post_status = 'published'";
+		}
 		$select_post_result = mysqli_query($connection, $select_post_query);
 		
 		show_query_error($select_post_result);
@@ -139,9 +146,10 @@
 		return $result;
 	}
 
-	function select_all_posts_by_author($author) {
+	function select_all_posts_by_author($author, $published = true) {
 		global $connection;
-		$query = "SELECT * FROM posts WHERE post_author = '$author' ORDER BY DATE(post_date) DESC";
+		$and_query = $published ? " AND posts_status = 'published'" : '';
+		$query = "SELECT * FROM posts WHERE post_author = '$author' $and_query ORDER BY DATE(post_date) DESC";
 		$result = mysqli_query($connection, $query);
 
 		show_query_error($result);
@@ -152,7 +160,7 @@
 	function select_posts_per_page($search_query = NULL) {
 		global $connection;
 		if (isset($_GET['page'])) {
-			$page = $_GET['page'];
+			$page = escape_string($_GET['page']);
 		} else {
 			$page = '';
 		}
@@ -171,7 +179,6 @@
 
 		$query .=  " ORDER BY post_date DESC LIMIT $page_num, 5";
 		// $query .= " ";
-		echo $query;
 		$result = mysqli_query($connection, $query);
 
 		show_query_error($result);
@@ -179,20 +186,31 @@
 		return $result;
 	}
 
-	function select_posts_per_page_by_category($cat_id) {
-		$query = "SELECT * FROM posts WHERE post_category_id = $cat_id AND post_status = 'published'";
+	function select_all_posts_per_page() {
+		$query = "SELECT * FROM posts";
 		return select_posts_per_page($query);
 	}
 
-	function select_posts_per_page_by_author($author) {
-		$query = "SELECT * FROM posts WHERE post_author = '$author' AND post_status = 'published'";
+	function select_posts_per_page_by_category($cat_id, $published = true) {
+		$query = "SELECT * FROM posts WHERE post_category_id = $cat_id";
+		if ($published) {
+			$query .= " AND post_status = 'published'";
+		}
+		return select_posts_per_page($query);
+	}
+
+	function select_posts_per_page_by_author($author, $published = true) {
+		$query = "SELECT * FROM posts WHERE post_author = '$author'";
+		if ($published) {
+			$query .= " AND post_status = 'published'";
+		}
 		return select_posts_per_page($query);
 	}
 
 
 	function prepare_page_posts($quantity) {
 		if (isset($_GET['page'])) {
-    		$page_num = $_GET['page'];
+    		$page_num = escape_string($_GET['page']);
     	} else {
     		$page_num = 1;
     	}
@@ -209,8 +227,20 @@
 			$result = select_post_by_category_id($val);
 			break;
 
+			case 'by_category_no_status':
+			$result = select_post_by_category_id($val, false);
+			break;
+
 			case 'by_author':
 			$result = select_all_posts_by_author($val);
+			break;
+
+			case 'by_author_no_status':
+			$result = select_all_posts_by_author($val, false);
+			break;
+
+			case 'all':
+			$result = select_all_posts();
 			break;
 
 			default:
@@ -265,7 +295,7 @@
 	function delete_post() {
 		global $connection;
 		if (isset($_GET['delete_id'])) {
-			$delete_id = $_GET['delete_id'];
+			$delete_id = escape_string($_GET['delete_id']);
 			$delete_query = "DELETE FROM posts WHERE post_id = $delete_id";
 
 			$delete_result = mysqli_query($connection, $delete_query);
@@ -345,7 +375,7 @@
 	function reset_post_views_count() {
 		global $connection;
 		if (isset($_GET['reset_id'])) {
-			$id = $_GET['reset_id'];
+			$id = escape_string($_GET['reset_id']);
 			$query = "UPDATE posts SET post_views_count = 0 WHERE post_id = $id";
 			$result = mysqli_query($connection, $query);
 
@@ -427,7 +457,7 @@
 	function delete_comment($header_url = 'view_all_comments.php') {
 		global $connection;
 		if (isset($_GET['delete_id'])) {
-			$delete_id = $_GET['delete_id'];
+			$delete_id = escape_string($_GET['delete_id']);
 			$delete_query = "DELETE FROM comments WHERE comment_id = $delete_id";
 
 			$delete_result = mysqli_query($connection, $delete_query);
@@ -441,7 +471,7 @@
 	function approve_comment($header_url = 'view_all_comments.php') {
 		global $connection;
 		if (isset($_GET['approve'])) {
-			$comment_id = $_GET['approve'];
+			$comment_id = escape_string($_GET['approve']);
 			$query = "UPDATE comments SET comment_status = 'approved' WHERE comment_id = $comment_id";
 			$result = mysqli_query($connection, $query);
 
@@ -453,7 +483,7 @@
 	function unapprove_comment($header_url = 'view_all_comments.php') {
 		global $connection;
 		if (isset($_GET['unapprove'])) {
-			$comment_id = $_GET['unapprove'];
+			$comment_id = escape_string($_GET['unapprove']);
 			$query = "UPDATE comments SET comment_status = 'unapproved' WHERE comment_id = $comment_id";
 			$result = mysqli_query($connection, $query);
 
@@ -526,13 +556,13 @@
 	function create_user_in_admin() {
 		global $connection;
 		
-			$username = $_POST['username'];
-			$password = $_POST['password'];
-			$firstname = $_POST['firstname'];
-			$lastname = $_POST['lastname'];
-			$email = $_POST['email'];
+			$username = escape_string($_POST['username']);
+			$password = escape_string($_POST['password']);
+			$firstname = escape_string($_POST['firstname']);
+			$lastname = escape_string($_POST['lastname']);
+			$email = escape_string($_POST['email']);
 			// $user_image = $_POST['user_image'];
-			$user_role = $_POST['user_role'];
+			$user_role = escape_string($_POST['user_role']);
 
 			$query = "INSERT INTO users (username, password, firstname, lastname, email, user_role) VALUES ('$username', '$password', '$firstname', '$lastname', '$email', '$user_role')";
 			$result = mysqli_query($connection, $query);
@@ -543,8 +573,9 @@
 
 	function delete_user() {
 		global $connection;
-		if (isset($_GET['delete_id'])) {
-			$delete_id = $_GET['delete_id'];
+		if (isset($_SESSION['user']) && $_SESSION['user']['db_user_role'] == 'admin') {
+			if (isset($_GET['delete_id'])) {
+			$delete_id = escape_string($_GET['delete_id']);
 			$delete_query = "DELETE FROM users WHERE user_id = $delete_id";
 
 			$delete_result = mysqli_query($connection, $delete_query);
@@ -552,6 +583,7 @@
 			show_query_error($delete_result);
 
 			header("Location: view_all_users.php");
+		}
 		}
 	}
 
@@ -586,12 +618,12 @@
 	function edit_user($id) {
 		global $connection;
 		if (isset($_POST['edit_user'])) {
-			$username = $_POST['username'];
-			$password = $_POST['password'];
-			$lastname = $_POST['lastname'];
-			$firstname = $_POST['firstname'];
-			$email = $_POST['email'];
-			$user_role = $_POST['user_role'];
+			$username = escape_string($_POST['username']);
+			$password = escape_string($_POST['password']);
+			$lastname = escape_string($_POST['lastname']);
+			$firstname = escape_string($_POST['firstname']);
+			$email = escape_string($_POST['email']);
+			$user_role = escape_string($_POST['user_role']);
 
 			// Encryption
         	$encrypted_password = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
@@ -613,17 +645,21 @@
 		}
 	}
 
+	function is_admin() {
+		return isset($_SESSION['user']) && $_SESSION['user']['db_user_role'] == 'admin';
+	}
+
 
 	// Login
 
 	function select_user_username_password($username, $password) {
 		global $connection;
-		$username = $_POST['username'];
-		$password = $_POST['password'];
-		$lastname = $_POST['lastname'];
-		$firstname = $_POST['firstname'];
-		$email = $_POST['email'];
-		$user_role = $_POST['user_role'];
+		$username = escape_string($_POST['username']);
+		$password = escape_string($_POST['password']);
+		$lastname = escape_string($_POST['lastname']);
+		$firstname = escape_string($_POST['firstname']);
+		$email = escape_string($_POST['email']);
+		$user_role = escape_string($_POST['user_role']);
 	}
 
 
@@ -632,11 +668,11 @@
 	function edit_profile($id) {
 		global $connection;
 		if (isset($_POST['edit_profile'])) {
-			$username = $_POST['username'];
-			$password = $_POST['password'];
-			$lastname = $_POST['lastname'];
-			$firstname = $_POST['firstname'];
-			$email = $_POST['email'];
+			$username = escape_string($_POST['username']);
+			$password = escape_string($_POST['password']);
+			$lastname = escape_string($_POST['lastname']);
+			$firstname = escape_string($_POST['firstname']);
+			$email = escape_string($_POST['email']);
 			
 			$query = "UPDATE users SET ";
 			$query .= "username = '$username', ";
@@ -654,11 +690,11 @@
 
 	function create_user_session_obj($user) {
 		$new_user = $user;
-		$new_user['db_username'] = $_POST['username'];
-		$new_user['db_password'] = $_POST['password'];
-		$new_user['db_firstname'] = $_POST['firstname'];
-		$new_user['db_email'] = $_POST['email'];
-		$new_user['db_lastname'] = $_POST['lastname'];
+		$new_user['db_username'] = escape_string($_POST['username']);
+		$new_user['db_password'] = escape_string($_POST['password']);
+		$new_user['db_firstname'] = escape_string($_POST['firstname']);
+		$new_user['db_email'] = escape_string($_POST['email']);
+		$new_user['db_lastname'] = escape_string($_POST['lastname']);
 		return $new_user;
 
 	}
