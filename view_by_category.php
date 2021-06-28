@@ -14,7 +14,6 @@
 
             <!-- Blog Entries Column -->
             <div class="col-md-8">
-                <?php echo basename($_SERVER['PHP_SELF']); ?>
 
                 <!-- Posts -->
 
@@ -23,7 +22,7 @@
                     if (isset($_GET['cat_id'])) {
                         $cat_id = escape_string($_GET['cat_id']);
 
-                        if (is_admin()) {
+                        if (is_admin_manager()) {
                             $posts = select_posts_per_page_by_category($cat_id, false);
                             extract(prepare_page_posts(posts_quantity('by_category_no_status', $cat_id)));
                         } else {

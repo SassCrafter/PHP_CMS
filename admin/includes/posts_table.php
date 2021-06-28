@@ -71,11 +71,14 @@
     </thead>
     <tbody>
         <?php
+            select_all_posts_info();
             if (isset($_GET['user_id'])) {
                 $user_id = escape_string($_GET['user_id']);
-                $get_posts_result = select_all_posts_by_user_id($user_id);
+                // $get_posts_result = select_all_posts_by_user_id($user_id);
+                $get_posts_result = select_all_posts_info_by_user_id($user_id);
             } else {
-                $get_posts_result = select_all_posts();
+                // $get_posts_result = select_all_posts();
+                $get_posts_result = select_all_posts_info();
             }
             while($row = mysqli_fetch_assoc($get_posts_result)){
                     $post_id = escape_string($row['post_id']);
@@ -83,6 +86,8 @@
                     $post_content = shorten_string($row['post_content'], 30);
                     $post_category_id = $row['post_category_id'];
                     $post_views_count = $row['post_views_count'];
+
+                    $post_category_title = $row['cat_title'];
 
                     $user_created_result = select_user_by_id($row['post_user_id']);
                     $user_row = mysqli_fetch_array($user_created_result);
@@ -97,16 +102,9 @@
                     </td>
                     <td><?php echo $post_content ?></td>
 
-                    <?php // Get category by id
-                    $category_result = select_category_by_id($post_category_id);
+                    
 
-                    while ($cat_row = mysqli_fetch_assoc($category_result)) {
-                        $post_category = $cat_row['cat_title'];
-                    }
-
-                    ?>
-
-                    <td><?php echo $post_category ?></td>
+                    <td><?php echo $post_category_title ?></td>
 
 
                     <td><?php echo $row['post_author'] ?></td>

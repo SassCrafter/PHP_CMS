@@ -44,7 +44,7 @@
 
                     <!-- Edit post if admin -->
                     <?php
-                        if (isset($_SESSION['user']) && $_SESSION['user']['db_user_role'] === 'admin') {
+                        if (is_admin_manager()) {
                             echo "
                                 <li>
                                     <a href='./admin/index.php'>Admin</a>

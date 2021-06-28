@@ -22,7 +22,7 @@
                     if (isset($_GET['author_name'])) {
                         $author_name = escape_string($_GET['author_name']);
 
-                        if (is_admin()) {
+                        if (is_admin_manager()) {
                             $posts = select_posts_per_page_by_author($author_name, false);
                             extract(prepare_page_posts(posts_quantity('by_author_no_status', $author_name))); 
                         } else {

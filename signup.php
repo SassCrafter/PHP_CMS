@@ -16,13 +16,9 @@
     
 <section id="login" style='min-height: 60vh;'>
     <?php
-        if (isset($_POST['submit'])) {
-            if (!check_form_fields_empty()) {
-                create_user();
-            } else {
-                $msg = "Form fields can't be empty.";
-                show_alert($msg, 'danger');
-            }
+        $errors = signup_user();
+        if (isset($errors)) {
+            ['username' => $username_error, 'email' => $email_error, 'password' => $password_error] = $errors;
         }
     ?>
     <div class="container">
@@ -32,23 +28,21 @@
                 <h1>Signup</h1>
                     <form role="form" action="signup.php" method="post" id="login-form" autocomplete="off">
                         <div class="form-group">
-                            <label for="firstname" class="sr-only">firstname</label>
                             <input type="text" name="firstname" id="firstname" class="form-control" placeholder="Enter Firstname">
                         </div>
                         <div class="form-group">
-                            <label for="lastname" class="sr-only">lastname</label>
                             <input type="text" name="lastname" id="lastname" class="form-control" placeholder="Enter Lastname">
                         </div>
                         <div class="form-group">
-                            <label for="username" class="sr-only">username</label>
+                            <?php if(!empty($username_error)) show_error_msg($username_error); ?>
                             <input type="text" name="username" id="username" class="form-control" placeholder="Enter Desired Username">
                         </div>
                          <div class="form-group">
-                            <label for="email" class="sr-only">Email</label>
+                            <?php if(!empty($email_error)) show_error_msg($email_error); ?>
                             <input type="email" name="email" id="email" class="form-control" placeholder="somebody@example.com">
                         </div>
                          <div class="form-group">
-                            <label for="password" class="sr-only">Password</label>
+                            <?php if(!empty($password_error)) show_error_msg($password_error); ?>
                             <input type="password" name="password" id="key" class="form-control" placeholder="Password">
                         </div>
                 

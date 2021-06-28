@@ -1,6 +1,11 @@
 <?php include_once 'includes/header.php' ?>
 <?php delete_user(); ?>
 
+<?php
+    if (!is_admin()) {
+        header("Location: ./index.php");
+    }
+?>
 
 
     <div id="wrapper">

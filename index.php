@@ -2,7 +2,6 @@
     include_once "includes/db.php";
     include_once "includes/header.php";
 ?>
-	
 
     <!-- Navigation -->
     <?php include_once "includes/navigation.php" ?>
@@ -17,10 +16,9 @@
                 
 
                 <!-- Posts -->
-                <?php echo basename($_SERVER['PHP_SELF']); ?>
 
                 <?php
-                	if (is_admin()) {
+                	if (is_admin_manager()) {
                         $posts = select_all_posts_per_page();
                         extract(prepare_page_posts(posts_quantity('all')));
                     } else {

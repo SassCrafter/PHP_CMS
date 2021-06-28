@@ -1,7 +1,9 @@
 <?php include_once 'includes/header.php' ?>
 
 <?php
-    
+    if (!is_admin_manager()) {
+        header("Location: ../index.php");
+    }
 ?>
 
     <div id="wrapper">

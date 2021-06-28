@@ -1,5 +1,9 @@
 <?php
 
+	function redirect($location) {
+		header("Location: $location");
+	}
+
 	function show_query_error($result) {
 		global $connection;
 		if (!$result) {
@@ -97,6 +101,30 @@
 
 	}
 
+	function select_all_posts_info() {
+		global $connection;
+		$query = "SELECT posts.post_id, posts.post_category_id, posts.post_title, posts.post_author, posts.post_user_id, posts.post_date, posts.post_image, posts.post_content, posts.post_tags, posts.post_comment_count, posts.post_status, posts.post_views_count, categories.cat_id, categories.cat_title";
+		$query .= " FROM posts";
+		$query .= " LEFT JOIN categories ON posts.post_category_id = categories.cat_id ORDER BY posts.post_date DESC";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+
+		return $result;
+	}
+
+	function select_all_posts_info_by_user_id($user_id) {
+		global $connection;
+		
+		$query = "SELECT * FROM posts";
+		$query .= " RIGHT JOIN categories ON posts.post_category_id = categories.cat_id";
+		$query .= " AND posts.post_user_id = $user_id ORDER BY posts.post_date DESC";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+		return $result;
+	}
+
 	function select_all_posts_by_user_id($user_id) {
 		global $connection;
 		$post_query = "SELECT * FROM posts WHERE post_user_id = $user_id ORDER BY post_date DESC";
@@ -178,7 +206,6 @@
 		}
 
 		$query .=  " ORDER BY post_date DESC LIMIT $page_num, 5";
-		// $query .= " ";
 		$result = mysqli_query($connection, $query);
 
 		show_query_error($result);
@@ -541,8 +568,6 @@
 		$lastname = escape_string($_POST['lastname']);
 		$user_role = $default_role ? 'admin' : $_POST['user_role'];
 
-        // Encryption
-        // $salt = get_rand_salt();
         $encrypted_password = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 
         $query = "INSERT INTO users (username, password, firstname, lastname, email, user_role) VALUES ('$username', '$encrypted_password', '$firstname', '$lastname', '$email', '$user_role')";
@@ -571,6 +596,8 @@
 			// header("Location: view_all_users.php");
 	}
 
+	
+
 	function delete_user() {
 		global $connection;
 		if (isset($_SESSION['user']) && $_SESSION['user']['db_user_role'] == 'admin') {
@@ -592,25 +619,24 @@
 
 	function display_role_select($show_selected = False, $active_role = '') {
 		global $connection;
-		$roles_query = "SELECT user_role FROM users";
+		$roles_query = "SELECT * FROM roles";
 		$roles_result = mysqli_query($connection, $roles_query);
 		show_query_error($roles_result);
 
-		$roles = [];
+		// $roles = [];
 
-		$rows = mysqli_fetch_all($roles_result, MYSQLI_ASSOC);
 		// print_r($rows);
 
-		foreach($rows as $row) {
-			if (!in_array($row['user_role'], $roles)) {
-				$roles[] = $row['user_role'];
-			}
-		}
+		// foreach($rows as $row) {
+		// 	if (!in_array($row['user_role'], $roles)) {
+		// 		$roles[] = $row['user_role'];
+		// 	}
+		// }
 		if($show_selected) {
 			echo "<option value='$active_role' selected>$active_role</option>";
 		}
-		foreach($roles as $role) {
-			echo "<option value='$role'>$role</option>";
+		while($row = mysqli_fetch_assoc($roles_result)) {
+			echo "<option value='$row[role_title]'>$row[role_title]</option>";
 		}
 	}
 
@@ -645,12 +671,79 @@
 		}
 	}
 
-	function is_admin() {
-		return isset($_SESSION['user']) && $_SESSION['user']['db_user_role'] == 'admin';
+	function is_admin($username = NULL) {
+		// return isset($_SESSION['user']) && ($_SESSION['user']['db_user_role'] == 'admin' || $_SESSION['user']['db_user_role'] == 'manager');
+		global $connection;
+		if ($username) {
+			$check_username = $username;
+		} else if ($_SESSION['user']) {
+			$check_username = $_SESSION['user']['db_username'];
+		} else {
+			$check_username = '';
+		}
+		$query = "SELECT user_role FROM users WHERE username = '$check_username'";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+		$row = mysqli_fetch_assoc($result);
+		return $row != NULL && $row['user_role'] == 'admin';
+	}
+
+	function is_admin_manager($username = NULL) {
+		// return isset($_SESSION['user']) && ($_SESSION['user']['db_user_role'] == 'admin' || $_SESSION['user']['db_user_role'] == 'manager');
+		global $connection;
+		if ($username) {
+			$check_username = $username;
+		} else if ($_SESSION['user']) {
+			$check_username = $_SESSION['user']['db_username'];
+		} else {
+			$check_username = '';
+		}
+		$query = "SELECT user_role FROM users WHERE username = '$check_username'";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+		$row = mysqli_fetch_assoc($result);
+		return $row != NULL && ($row['user_role'] == 'admin' || $row['user_role'] == 'manager');
 	}
 
 
 	// Login
+
+	function signup_user() {
+        $return_val = NULL;
+		if (isset($_POST['submit'])) {
+            if (check_form_fields_empty()) {
+                $msg = "Form fields can't be empty";
+                show_alert($msg, 'danger');
+            } else {
+            	$errors = validate_user_signup($_POST['username'], $_POST['email'], $_POST['password']);
+
+            	if (empty($errors['username']) && empty($errors['email']) && empty($errors['password'])) {
+            		create_user();
+            		redirect('./index.php');
+            	} else {
+            		$return_val = $errors;
+            	}
+            } 
+        }
+
+        return $return_val;
+	}
+
+	function validate_user_signup($username, $email, $password) {
+		$errors = [
+			'username' => '',
+			'email' => '',
+			'password' => '',
+		];
+
+		$errors['username'] = validate_username($username);
+		$errors['email'] = validate_email($email);
+		$errors['password'] = validate_password($password);
+
+		return $errors;
+	}
 
 	function select_user_username_password($username, $password) {
 		global $connection;
@@ -660,6 +753,69 @@
 		$firstname = escape_string($_POST['firstname']);
 		$email = escape_string($_POST['email']);
 		$user_role = escape_string($_POST['user_role']);
+	}
+
+	function username_exists($username) {
+		global $connection;
+		$query = "SELECT user_role FROM users WHERE username = '$username'";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+		return mysqli_num_rows($result) > NULL;
+	}
+
+	function email_exists($email) {
+		global $connection;
+		$query = "SELECT user_role FROM users WHERE email = '$email'";
+		$result = mysqli_query($connection, $query);
+
+		show_query_error($result);
+		return mysqli_num_rows($result) > NULL;
+	}
+
+	function username_email_exist($username, $email) {
+		return username_exists($username) && email_exists($email);
+	}
+
+	function validate_username($username) {
+		$error = '';
+
+		if (username_exists($username)) {
+			$error = "Username already exists! ";
+		}
+		if (strlen($username) < 4 && strlen($username) > 16) {
+			$error .= 'Username must be more than 4 and less than 16 characters! ';
+		}
+
+		return $error;
+	}
+
+	function validate_password($password) {
+		$error = '';
+		$uppercase = preg_match('@[A-Z]@', $password);
+		$lowercase = preg_match('@[a-z]@', $password);
+		$number    = preg_match('@[0-9]@', $password);
+		$specialChars = preg_match('@[^\w]@', $password);
+
+		if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($password) < 8) {
+			$error = 'Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.';
+		}
+
+		return $error;
+	}
+
+	function validate_email($email) {
+		$error = '';
+
+		if (email_exists($email)) {
+			$error = "Email already exists, you can <a href='../../index.php'>Login</a>";
+		}
+
+		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+		    $error .= "Email address is invalid, try entering again.";
+		}
+
+		return $error;
 	}
 
 
@@ -718,6 +874,22 @@
 			</div>
 		";
 	}
+
+	function show_error_msg($message) {
+		echo "
+			<h5 class='text-danger'>$message</h5>
+		";
+	}
+
+
+
+
+
+
+
+
+
+
 
 	function check_form_fields_empty() {
 		return count(array_filter($_POST)) != count($_POST);
